@@ -1,0 +1,36 @@
+#pragma once
+
+#include "DataType.h"
+#include "DotNetClass.h"
+#include "DotNetField.h"
+#include "DotNetAssembly.h"
+
+#include <map>
+#include <vector>
+using namespace std;
+
+class CBinaryStream;
+
+class CDotNetFileReader
+{
+public:
+	CDotNetFileReader(CBinaryStream& stream);
+	~CDotNetFileReader(void);
+	//TODO: eventually return a special object that contains all the objects read in.
+	CDotNetClass* Deserialize();
+
+protected:
+
+	void ReadClass();
+	CDotNetField* ReadField(EDataType eDataType);
+	void ReadEnd();
+	void ReadAssembly();
+
+private:
+
+	CBinaryStream& m_Stream;
+	CDotNetClassPtrMap m_mpClasses;
+	CDotNetAssemblyPtrMap m_mpAssemblies;
+	CDotNetFieldPtrVector m_arNumber9;
+	vector<CDotNetClass*> m_arCurrentClass;
+};
