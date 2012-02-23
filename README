@@ -1,0 +1,10 @@
+This project was compiled in vc++ 2011 dev preview, and most likely 
+wont compile anywhere else until i can test them :>
+
+TODO:
+
+- Add compatibility with MinGW GCC.
+- Add compatibility with GCC.
+- Add More types
+  * currently only Int16, Int32, Int64 are supported.
+- Make this a LIB not a command line exe, still bundle exec as a example.

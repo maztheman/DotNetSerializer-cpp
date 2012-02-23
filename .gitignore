@@ -2,7 +2,8 @@
 *.opensdf
 *.sln
 *.suo
-Debug/*
-Release/*
+Debug/
+Release/
 _*/
-ipch/*
+ipch/
+bin/
