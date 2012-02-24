@@ -27,6 +27,7 @@ public:
 	INT16 GetInt16( string name );
 	INT32 GetInt32( string name );
 	INT64 GetInt64( string name );
+	string GetString( string name );
 	CDotNetClass* GetObject( string name );
 
 protected:

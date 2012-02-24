@@ -51,6 +51,21 @@ INT64 CDotNetClass::GetInt64( string name )
 	return GetData<INT64, CInt64Field>( name );
 }
 
+string CDotNetClass::GetString( string name )
+{
+	string sValue;
+	size_t nIndex = FindName( name );
+	if ( nIndex == -1 )
+		return sValue;
+
+	CDotNetField* pField = m_arFieldValues[nIndex];
+	CStringField* pValue = dynamic_cast<CStringField*>(pField);
+	if ( pValue == 0)
+		return sValue;
+
+	return pValue->Value();
+}
+
 CDotNetClass* CDotNetClass::GetObject( string name )
 {
 	size_t nIndex = FindName( name );

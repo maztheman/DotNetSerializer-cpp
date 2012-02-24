@@ -55,6 +55,12 @@ void CDotNetFileReader::ReadClass()
 			m_Stream.ReadString( sClassName );
 			m_Stream.ReadInt32(); //some id, maybe a way to figure out it later... its 2
 		}
+		else if ( eSchemaDataType == eSchemaDataType_String )
+		{
+			m_Stream.ReadInt32(); //no clue!!
+			EDataType dataType = (EDataType)m_Stream.ReadByte();
+			oClass.FieldTypes().push_back( dataType );
+		}
 	}
 
 	oClass.UnknownID() = m_Stream.ReadInt32();//TODO: figure out why this 2 is here?
@@ -94,6 +100,13 @@ CDotNetField* CDotNetFileReader::ReadField(EDataType eDataType)
 			{
 				throw std::exception("I dont know what any other type (!9) for the eDataType_Invalid could be");
 			}
+		}
+		break;
+	case eDataType_String:
+		{
+			CStringField* pValue = new CStringField;
+			m_Stream.ReadString( pValue->Value() );
+			pField = pValue;
 		}
 		break;
 	case eDataType_Int16:

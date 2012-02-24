@@ -31,9 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if ( pObject )
 	{
-		INT64 data = pObject->GetObject( "TheSecondClass" )->GetInt64( "TestValue" );
-		INT32 data2 = pObject->GetInt32("Testing123");
-		INT32 data3 = pObject->GetInt32("Testing456");
+		string sHello = pObject->GetString("StringValue");
 		delete pObject;
 	}
 
