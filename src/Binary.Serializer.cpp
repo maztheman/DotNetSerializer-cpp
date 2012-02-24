@@ -31,7 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if ( pObject )
 	{
-		string sHello = pObject->GetString("StringValue");
+		vector<string>& arr = pObject->GetStringArray("StringValue");
 		delete pObject;
 	}
 

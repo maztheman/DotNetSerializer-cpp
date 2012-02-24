@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArrayReader.cpp" />
     <ClCompile Include="Binary.Serializer.cpp" />
     <ClCompile Include="BinaryStream.cpp" />
     <ClCompile Include="DotNetAssembly.cpp" />
@@ -105,6 +106,7 @@
     <ClCompile Include="tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArrayReader.h" />
     <ClInclude Include="BinaryStream.h" />
     <ClInclude Include="DataType.h" />
     <ClInclude Include="DotNetAssembly.h" />

@@ -46,6 +46,16 @@ INT32 CDotNetClass::GetInt32( string name )
 	return GetData< INT32, CInt32Field>( name );
 }
 
+vector<string>& CDotNetClass::GetStringArray( string name )
+{
+	return GetArrayData< vector<string> , CStringArrayField>( name );
+}
+
+vector<INT32>& CDotNetClass::GetInt32Array( string name )
+{
+	return GetArrayData< vector<INT32> , CInt32ArrayField>( name );
+}
+
 INT64 CDotNetClass::GetInt64( string name )
 {
 	return GetData<INT64, CInt64Field>( name );

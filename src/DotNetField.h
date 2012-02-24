@@ -56,6 +56,9 @@ typedef CDotNetGenericField< eDataType_Invalid, CDotNetClass* > CUserClassField;
 typedef CDotNetGenericField< eDataType_Int16, INT16 > CInt16Field;
 typedef CDotNetGenericField< eDataType_Int32, INT32 > CInt32Field;
 typedef CDotNetGenericField< eDataType_Int64, INT64 > CInt64Field;
+
+typedef CDotNetGenericField< eDataType_Invalid, vector<INT32> > CInt32ArrayField;
+typedef CDotNetGenericField< eDataType_Invalid, vector<string> > CStringArrayField;
 typedef CDotNetGenericField< eDataType_String, string > CStringField;
 
 class CDotNetFieldPtrVector : public vector<CDotNetField*>

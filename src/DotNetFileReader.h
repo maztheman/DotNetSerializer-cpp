@@ -22,7 +22,7 @@ public:
 protected:
 
 	void ReadClass();
-	CDotNetField* ReadField(EDataType eDataType);
+	CDotNetField* ReadField(ESchemaDataType eSchemaDataType,EDataType eDataType);
 	void ReadEnd();
 	void ReadAssembly();
 
