@@ -35,4 +35,4 @@ size_t CDotNetFieldPtrVector::GetIndexByID( INT32 id )
 	}
 
 	return -1;
-	}
+}

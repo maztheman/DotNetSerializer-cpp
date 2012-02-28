@@ -31,7 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if ( pObject )
 	{
-		vector<string>& arr = pObject->GetStringArray("StringValue");
+		std::vector<INT32>& arr = pObject->GetInt32Array("StringValue");
 		delete pObject;
 	}
 

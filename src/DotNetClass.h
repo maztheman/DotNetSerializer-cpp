@@ -20,6 +20,7 @@ public:
 	INT32& FieldCount() { return m_nFieldCount; }
 	vector<string>& FieldNames() { return m_arFieldNames; }
 	vector<EDataType>& FieldTypes() { return m_arFieldTypes; }
+	vector<string>& FieldTypeCodes() { return m_arFieldTypeCodes; }
 	vector<EArrayDataType>& FieldArrayTypes() { return m_arArrayTypes; }
 	vector<INT32>& ArraySizes() { return m_arArraySizes; }
 	vector< ESchemaDataType>& SchemaTypes() { return m_arSchemaTypes; }
@@ -76,6 +77,7 @@ private:
 	INT32 m_nFieldCount;
 	vector<string> m_arFieldNames;
 	vector<EDataType> m_arFieldTypes;
+	vector<string> m_arFieldTypeCodes;
 	vector<EArrayDataType> m_arArrayTypes;
 	vector<INT32> m_arArraySizes;
 	vector<ESchemaDataType> m_arSchemaTypes;

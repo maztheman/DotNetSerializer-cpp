@@ -16,7 +16,12 @@ CDotNetFileReader::~CDotNetFileReader(void)
 {
 }
 
-void CDotNetFileReader::ReadClass()
+bool IsSystemClass( string& sClassName )
+{
+	return sClassName.find( "System." ) == 0;//starts with System.
+}
+
+void CDotNetFileReader::ReadClass(bool bSystemClass = false)
 {
 	BYTE id = m_Stream.ReadInt32();
 	CDotNetClass* pNewClass = new CDotNetClass;
@@ -32,6 +37,7 @@ void CDotNetFileReader::ReadClass()
 	oClass.FieldArrayTypes().resize( nFieldCount, eArrayDataType_Invalid );
 	oClass.FieldNames().resize( nFieldCount );
 	oClass.FieldTypes().resize( nFieldCount, eDataType_Invalid );
+	oClass.FieldTypeCodes().resize( nFieldCount );
 	oClass.FieldValues().resize( nFieldCount, (CDotNetField*)0);
 	oClass.SchemaTypes().resize( nFieldCount, eSchemaDataType_Invalid );
 	oClass.ArraySizes().resize( nFieldCount, -1 );
@@ -44,6 +50,7 @@ void CDotNetFileReader::ReadClass()
 	EArrayDataType* pArrayDataTypes = GET_DATA(&oClass.FieldArrayTypes());
 	string* pFieldNames = GET_DATA(&oClass.FieldNames());
 	EDataType* pDataTypes = GET_DATA(&oClass.FieldTypes());
+	string* pDataTypeCodes = GET_DATA(&oClass.FieldTypeCodes());
 	CDotNetField** ppFieldValues = GET_DATA(&oClass.FieldValues());
 	ESchemaDataType* pSchemaTypes = GET_DATA(&oClass.SchemaTypes());
 	INT32* pArraySizes = GET_DATA(&oClass.ArraySizes());
@@ -70,8 +77,13 @@ void CDotNetFileReader::ReadClass()
 		{
 			pDataTypes[n] = eDataType_Invalid;
 			string sClassName;
-			m_Stream.ReadString( sClassName );
+			m_Stream.ReadString( pDataTypeCodes[n] );
 			m_Stream.ReadInt32(); //some id, maybe a way to figure out it later... its 2
+		}
+		else if ( eSchemaDataType == eSchemaDataType_SystemObject )
+		{
+			pDataTypes[n] = eDataType_Invalid;
+			m_Stream.ReadString( pDataTypeCodes[n] );//looks like its fully qualified.
 		}
 		else if ( eSchemaDataType == eSchemaDataType_String )
 		{
@@ -89,7 +101,8 @@ void CDotNetFileReader::ReadClass()
 		}
 	}
 
-	oClass.UnknownID() = m_Stream.ReadInt32();//TODO: figure out why this 2 is here?
+	if ( !bSystemClass )
+		oClass.UnknownID() = m_Stream.ReadInt32();//TODO: figure out why this 2 is here?, looks like on system classes this id is NOT present.
 				
 	for(INT32 n = 0; n < nFieldCount; n++ )
 	{
@@ -102,7 +115,6 @@ void CDotNetFileReader::ReadClass()
 	}
 
 	m_mpClasses.insert( pair<INT32,CDotNetClass*>( id, pNewClass) );
-
 }
 
 CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDataType eDataType)
@@ -132,12 +144,32 @@ CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDat
 	}
 	else if ( eSchemaDataType == eSchemaDataType_Array )
 	{
-		m_Stream.ReadByte();//9
-		m_Stream.ReadInt32();//3
+		BYTE byte = m_Stream.ReadByte();
+		if ( byte == 9 )
+		{
+			CUserClassField* pUserField = new CUserClassField;
+			pUserField->Value() = new CDotNetClass;
+			pUserField->Value()->ID() = m_Stream.ReadInt32();
+			pField = pUserField;
+			m_arNumber9.push_back( pUserField );
+		}
+		else
+		{
+			throw std::exception("I dont know what any other type (!9) for the eSchemaDataType_Array could be");
+		}
+
+
+		/*m_Stream.ReadByte();//9
+		INT32 nArrayType = m_Stream.ReadInt32();//3
+		if ( nArrayType == 4 )
+		{
+			m_Stream.ReadInt32();//Real Size
+			m_Stream.ReadInt32();//3
+		}
 		m_Stream.ReadByte();//0xF
 		m_Stream.ReadInt32();//3
 
-		INT32 nCount = m_Stream.ReadInt32();
+		INT32 nCount = m_Stream.ReadInt32();//on system arrays like lists this is the padding count
 		EDataType type = (EDataType)m_Stream.ReadByte();
 
 		switch( type )
@@ -150,6 +182,12 @@ CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDat
 			break;
 		}
 
+		if ( nArrayType == 4 )
+		{
+			pField->Name() = "_items";
+		}
+
+
 		CArrayReader* pReader = CArrayReader::GetArrayReaderByType( type, m_Stream );
 		pReader->SetField( pField );
 
@@ -158,7 +196,7 @@ CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDat
 			pReader->Read();
 		}
 
-		delete pReader;
+		delete pReader;*/
 	}
 	else
 	{
@@ -274,8 +312,9 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 			{
 			case eSchemaType_SystemClass:
 				{
-
+					ReadClass(true);
 				}
+				break;
 			case eSchemaType_Class:
 				{//class
 					ReadClass();
@@ -291,6 +330,52 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 			case eSchemaType_Assembly:
 				{
 					ReadAssembly();
+				}
+				break;
+			case eSchemaType_FieldRef:
+				{
+					INT32 refId = m_Stream.ReadInt32();
+					size_t nIndex = m_arNumber9.GetIndexByID( refId );
+					if ( nIndex == -1 ) throw new std::exception("Bad Field Reference ID");
+					CDotNetField* pField = m_arNumber9[nIndex];
+					CDotNetClass* pParent = pField->GetParent();
+					if ( pParent->FieldCount() <= 0 ) throw new std::exception("bad field count");
+					size_t nFieldIndex = pParent->FieldValues().GetIndexByID( refId );
+					if ( nFieldIndex == -1 ) throw new std::exception("Could not find field...");
+
+					CDotNetField** pFields = GET_DATA( &pParent->FieldValues() );
+
+					if ( pParent->SchemaTypes()[nFieldIndex] == eSchemaDataType_Array )
+					{
+						INT32 nCount = m_Stream.ReadInt32();//on system arrays like lists this is the padding count
+						EDataType type = (EDataType)m_Stream.ReadByte();
+						CDotNetField* pNewField = (CDotNetField*)0;
+
+						switch( type )
+						{
+						case eDataType_Int32:
+							{
+								CInt32ArrayField* pValue = new CInt32ArrayField;
+								pNewField = pValue;
+							}
+							break;
+						}
+
+						CArrayReader* pReader = CArrayReader::GetArrayReaderByType( type, m_Stream );
+						pReader->SetField( pNewField );
+
+						for(INT32 n = 0; n < nCount; n++ )
+						{
+							pReader->Read();
+						}
+						delete pReader;
+
+						pNewField->Name() = pFields[nFieldIndex]->Name();
+						delete pFields[nFieldIndex];
+						pFields[nFieldIndex] = pNewField;
+					}
+
+					m_arNumber9.erase( m_arNumber9.begin() + nIndex );
 				}
 				break;
 			}
