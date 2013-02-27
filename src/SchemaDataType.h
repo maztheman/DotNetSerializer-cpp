@@ -10,3 +10,5 @@ enum ESchemaDataType
 	eSchemaDataType_StringArray  = 6,
 	eSchemaDataType_Array  = 7
 };
+
+typedef std::vector<ESchemaDataType> CSchemaDataTypeVector;

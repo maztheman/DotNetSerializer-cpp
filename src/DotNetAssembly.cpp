@@ -3,6 +3,7 @@
 
 
 CDotNetAssembly::CDotNetAssembly(void)
+	: m_nID(-1)
 {
 }
 

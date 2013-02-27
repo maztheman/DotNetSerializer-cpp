@@ -10,6 +10,31 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\ArrayReader.h" />
+    <ClInclude Include="..\..\..\src\BinaryStream.h" />
+    <ClInclude Include="..\..\..\src\DataType.h" />
+    <ClInclude Include="..\..\..\src\DotNetAssembly.h" />
+    <ClInclude Include="..\..\..\src\DotNetClass.h" />
+    <ClInclude Include="..\..\..\src\DotNetField.h" />
+    <ClInclude Include="..\..\..\src\DotNetFileReader.h" />
+    <ClInclude Include="..\..\..\src\SchemaDataType.h" />
+    <ClInclude Include="..\..\..\src\SchemaType.h" />
+    <ClInclude Include="..\..\..\src\stdafx.h" />
+    <ClInclude Include="..\..\..\src\targetver.h" />
+    <ClInclude Include="..\..\..\src\tools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\ArrayReader.cpp" />
+    <ClCompile Include="..\..\..\src\Binary.Serializer.cpp" />
+    <ClCompile Include="..\..\..\src\BinaryStream.cpp" />
+    <ClCompile Include="..\..\..\src\DotNetAssembly.cpp" />
+    <ClCompile Include="..\..\..\src\DotNetClass.cpp" />
+    <ClCompile Include="..\..\..\src\DotNetField.cpp" />
+    <ClCompile Include="..\..\..\src\DotNetFileReader.cpp" />
+    <ClCompile Include="..\..\..\src\stdafx.cpp" />
+    <ClCompile Include="..\..\..\src\tools.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>
@@ -45,15 +70,16 @@
     <_ProjectFileVersion>11.0.40825.2</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>..\..\..\bin\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>DotNetSerializer-cmd</TargetName>
+    <TargetName>Binary.Serializer</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>..\..\..\bin\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>Binary.Serializer</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -62,9 +88,10 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -82,6 +109,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -91,37 +119,6 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="ArrayReader.cpp" />
-    <ClCompile Include="Binary.Serializer.cpp" />
-    <ClCompile Include="BinaryStream.cpp" />
-    <ClCompile Include="DotNetAssembly.cpp" />
-    <ClCompile Include="DotNetClass.cpp" />
-    <ClCompile Include="DotNetField.cpp" />
-    <ClCompile Include="DotNetFileReader.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="tools.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ArrayReader.h" />
-    <ClInclude Include="BinaryStream.h" />
-    <ClInclude Include="DataType.h" />
-    <ClInclude Include="DotNetAssembly.h" />
-    <ClInclude Include="DotNetClass.h" />
-    <ClInclude Include="DotNetField.h" />
-    <ClInclude Include="DotNetFileReader.h" />
-    <ClInclude Include="SchemaDataType.h" />
-    <ClInclude Include="SchemaType.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="tools.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

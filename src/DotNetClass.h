@@ -4,89 +4,69 @@
 #include "SchemaDataType.h"
 #include "DotNetField.h"
 
-#include <vector>
-#include <string>
-#include <map>
-using namespace std;
+using std::vector;
+using std::map;
 
 class CDotNetClass
 {
+	PROPERTY(ID, INT32, m_nId)
+	PROPERTY(Name, string, m_sName)
+	PROPERTY(FieldCount, INT32, m_nFieldCount)
+	PROPERTY_OBJ(FieldNames, CStringVector, m_arFieldNames)
+	PROPERTY_OBJ(FieldTypes, CDataTypeVector, m_arFieldTypes)
+	PROPERTY_OBJ(FieldTypeCodes, CStringVector, m_arFieldTypeCodes)
+	PROPERTY_OBJ(FieldArrayTypes, CArrayDataTypeVector, m_arArrayTypes)
+	PROPERTY_OBJ(ArraySizes, CInt32Vector, m_arArraySizes)
+	PROPERTY_OBJ(SchemaTypes, CSchemaDataTypeVector, m_arSchemaTypes)
+	PROPERTY_OBJ(FieldValues, CDotNetFieldPtrVector, m_arFieldValues)
+	PROPERTY(UnknownID, INT32, m_nUnknownID)
+
 public:
 	CDotNetClass(void);
 	~CDotNetClass(void);
 
-	INT32& ID() { return m_nId; }
-	string& Name() { return m_sName; }
-	INT32& FieldCount() { return m_nFieldCount; }
-	vector<string>& FieldNames() { return m_arFieldNames; }
-	vector<EDataType>& FieldTypes() { return m_arFieldTypes; }
-	vector<string>& FieldTypeCodes() { return m_arFieldTypeCodes; }
-	vector<EArrayDataType>& FieldArrayTypes() { return m_arArrayTypes; }
-	vector<INT32>& ArraySizes() { return m_arArraySizes; }
-	vector< ESchemaDataType>& SchemaTypes() { return m_arSchemaTypes; }
-	CDotNetFieldPtrVector& FieldValues() { return m_arFieldValues; }
-	INT32& UnknownID() { return m_nUnknownID; }
-
-	INT16 GetInt16( string name );
-	INT32 GetInt32( string name );
-	INT64 GetInt64( string name );
-	string GetString( string name );
-	CDotNetClass* GetObject( string name );
-	vector<INT32>& GetInt32Array( string name );
-	vector<string>& GetStringArray( string name );
+	INT16 GetInt16(string name);
+	INT32 GetInt32(string name);
+	INT64 GetInt64(string name);
+	string GetString(string name);
+	CDotNetClass* GetObject(string name);
+	CInt32Vector& GetInt32Array(string name);
+	CStringVector& GetStringArray(string name);
 
 protected:
 
-	size_t FindName( string& name );
+	size_t FindName(string& name);
 
 	template<typename DATA_TYPE, typename FIELD_TYPE>
-	DATA_TYPE GetData( string& name )
+	DATA_TYPE GetData(string& name)
 	{
-		size_t nIndex = FindName( name );
-		if ( nIndex == -1 )
-			return (DATA_TYPE)-1;
-
+		size_t nIndex = FindName(name);
+		if (nIndex == -1)
+			return static_cast<DATA_TYPE>(-1);
 		CDotNetField* pField = m_arFieldValues[nIndex];
 		FIELD_TYPE* pValue = dynamic_cast<FIELD_TYPE*>(pField);
-		if ( pValue == 0)
-			return (DATA_TYPE)-1;
-
-		return (DATA_TYPE)pValue->Value();
+		if (pValue == 0)
+			return static_cast<DATA_TYPE>(-1);
+		return static_cast<DATA_TYPE>(pValue->Value());
 	}
 
 	template<typename DATA_TYPE, typename FIELD_TYPE>
-	DATA_TYPE& GetArrayData( string& name ) throw (std::exception)
+	DATA_TYPE& GetArrayData(string& name)
 	{
-		size_t nIndex = FindName( name );
-		if ( nIndex == -1 )
-			throw new std::exception("Field doesnt exist");
+		size_t nIndex = FindName(name);
+		if (nIndex == -1)
+			throw std::exception("Field doesnt exist");
 
 		CDotNetField* pField = m_arFieldValues[nIndex];
 		FIELD_TYPE* pValue = dynamic_cast<FIELD_TYPE*>(pField);
-		if ( pValue == 0)
-			throw new std::exception("Field is not correct type");
+		if (pValue == 0)
+			throw std::exception("Field is not correct type");
 
 		return pValue->Value();
 	}
-
-
-private:
-
-	INT32 m_nId;
-	string m_sName;
-	INT32 m_nFieldCount;
-	vector<string> m_arFieldNames;
-	vector<EDataType> m_arFieldTypes;
-	vector<string> m_arFieldTypeCodes;
-	vector<EArrayDataType> m_arArrayTypes;
-	vector<INT32> m_arArraySizes;
-	vector<ESchemaDataType> m_arSchemaTypes;
-	CDotNetFieldPtrVector m_arFieldValues;
-	INT32 m_nUnknownID;
 };
 
-
-class CDotNetClassPtrMap : public map< INT32, CDotNetClass*>
+class CDotNetClassPtrMap : public std::map<INT32, CDotNetClass*>
 {
 public:
 	CDotNetClassPtrMap() {}
@@ -94,15 +74,13 @@ public:
 	{
 		ResetContent();
 	}
-
 	void ResetContent()
 	{
-		while(!empty())
-		{
+		while(!empty()) {
 			iterator it = begin();
 			CDotNetClass* pObject = it->second;
 			delete pObject;
-			erase( it );
+			erase(it);
 		}
 	}
 };

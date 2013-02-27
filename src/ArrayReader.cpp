@@ -12,9 +12,9 @@ CArrayReader::~CArrayReader(void)
 }
 
 
-CArrayReader* CArrayReader::GetArrayReaderByType( EDataType eDataType, CBinaryStream& stream )
+CArrayReader* CArrayReader::GetArrayReaderByType(EDataType eDataType, CBinaryStream& stream)
 {
-	switch( eDataType )
+	switch(eDataType)
 	{
 	case eDataType_Int32:
 		return new CInt32ArrayReader(stream);
@@ -33,14 +33,14 @@ CInt32ArrayReader::CInt32ArrayReader(CBinaryStream& stream) : CArrayReader(strea
 
 }
 
-void CInt32ArrayReader::SetField( CDotNetField* pField )
+void CInt32ArrayReader::SetField(CDotNetField* pField)
 {
-	m_pField = dynamic_cast<CInt32ArrayField*>(pField);
+	m_pField = static_cast<CInt32ArrayField*>(pField);
 }
 
 void CInt32ArrayReader::Read()
 {
-	m_pField->Value().push_back( m_Stream.ReadInt32() );
+	m_pField->Value().push_back(m_Stream.ReadInt32());
 }
 
 CStringArrayReader::CStringArrayReader(CBinaryStream& stream) : CArrayReader(stream)
@@ -48,9 +48,9 @@ CStringArrayReader::CStringArrayReader(CBinaryStream& stream) : CArrayReader(str
 
 }
 
-void CStringArrayReader::SetField( CDotNetField* pField )
+void CStringArrayReader::SetField(CDotNetField* pField)
 {
-	m_pField = dynamic_cast<CStringArrayField*>(pField);
+	m_pField = static_cast<CStringArrayField*>(pField);
 }
 
 void CStringArrayReader::Read()
@@ -58,6 +58,6 @@ void CStringArrayReader::Read()
 	m_Stream.ReadByte();//next item is another string?
 	m_Stream.ReadInt32(); // some sort if global id?
 	string sValue;
-	m_Stream.ReadString( sValue );
-	m_pField->Value().push_back( sValue );
+	m_Stream.ReadString(sValue);
+	m_pField->Value().push_back(sValue);
 }

@@ -2,7 +2,11 @@
 
 #include <istream>
 #include <string>
-using namespace std;
+#include <vector>
+
+using std::istream;
+using std::string;
+using std::vector;
 
 class CBinaryStream
 {
@@ -18,12 +22,12 @@ public:
 	BYTE ReadByte();
 
 	template<size_t SIZE>
-	void ReadBytes( BYTE (&buffer)[SIZE] )
+	void ReadBytes(BYTE (&buffer)[SIZE])
 	{
-		ReadBytes( &buffer[0], SIZE );
+		ReadBytes(&buffer[0], SIZE);
 	}
 
-	void ReadBytes( BYTE* ppBuffer, size_t nSize );
+	void ReadBytes(BYTE* ppBuffer, size_t nSize);
 	char ReadChar();
 	void ReadChars(string& ppBuffer, size_t nCount);
 	//Supposed to be 16 byte QUAD-precision double.
@@ -41,23 +45,23 @@ public:
 
 	inline bool IsEOF() 
 	{ 
-		if ( m_nSize == -1 || m_nIndex == -1) return true;
+		if (m_nSize == -1 || m_nIndex == -1) return true;
 		return m_nIndex >= m_nSize; 
 	}
 
 protected:
 
 	template<size_t SIZE>
-	void ReadIntoBuffer( BYTE (&buffer)[SIZE] )
+	void ReadIntoBuffer(BYTE (&buffer)[SIZE])
 	{
-		memcpy( &buffer[0], &m_pData[m_nIndex], SIZE );
+		memcpy(&buffer[0], &m_arData[m_nIndex], SIZE);
 		m_nIndex += SIZE;
 	}
 
 	int Read7BitInt();
 
 private:
-	LPBYTE m_pData;
+	CByteVector m_arData;
 	size_t m_nIndex;
 	size_t m_nSize;
 };

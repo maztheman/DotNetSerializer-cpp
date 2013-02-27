@@ -5,11 +5,10 @@
 #include "DotNetField.h"
 #include "DotNetAssembly.h"
 
-#include <map>
-#include <vector>
-using namespace std;
-
 class CBinaryStream;
+
+using std::vector;
+using std::map;
 
 class CDotNetFileReader
 {

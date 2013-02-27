@@ -1,7 +1,7 @@
 #pragma once
 #include "DataType.h"
 
-INT32 ToInt32( BYTE* pBuffer );
+INT32 ToInt32(BYTE* pBuffer);
 
 #if _MSC_VER >= 1400
 #define GET_DATA(x) ((*(x)).data());

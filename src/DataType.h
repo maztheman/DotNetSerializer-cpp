@@ -17,3 +17,6 @@ enum EArrayDataType
 	eArrayDataType_Int32 = 8,
 	eArrayDataType_String = 9
 };
+
+typedef std::vector<EDataType> CDataTypeVector;
+typedef std::vector<EArrayDataType> CArrayDataTypeVector;

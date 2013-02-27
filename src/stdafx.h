@@ -2,17 +2,18 @@
 // or project specific include files that are used frequently, but
 // are changed infrequently
 //
-
 #pragma once
 
 #include "targetver.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <tchar.h>
+#include <vector>
+#include <string>
+#include <map>
+#include <set>
+#include <algorithm>
 
-
-
-// TODO: reference additional headers your program requires here
 typedef unsigned char BYTE, *LPBYTE;
 typedef signed char SBYTE, *LPSBYTE;
 
@@ -24,3 +25,23 @@ typedef unsigned int UINT32, *LPUINT32;
 
 typedef signed long long int INT64, *LPINT64;
 typedef unsigned long long int UINT64, *LPUINT64;
+
+typedef std::vector<BYTE> CByteVector;
+typedef std::vector<SBYTE> CSByteVector;
+typedef std::vector<INT32> CInt32Vector;
+typedef std::vector<std::string> CStringVector;
+
+#define PROPERTY(name, type, var)\
+private:\
+type var;\
+public:\
+type& name () { return var; }\
+const type& Get ## name () const { return var; }\
+void Set ## name (type value) { var = value; }
+
+#define PROPERTY_OBJ(name, type, var)\
+private:\
+type var;\
+public:\
+type& name () { return var; }\
+const type& Get ## name () const { return var; }

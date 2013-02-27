@@ -7,31 +7,31 @@
 
 #include <fstream>
 #include <iostream>
-using namespace std;
+
+using std::fstream;
+using std::cout;
+using std::endl;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	if ( argc != 2 )
-	{
-		cout << "Usage: DotNetSerializer.exe <file>" << endl;
+	if (argc != 2) {
+		cout << "Usage: Binary.Serializer.exe <file>" << endl;
 		return 0;
 	}
 
-	fstream fs( argv[1], ios_base::in | ios_base::binary );
-	if ( !fs.is_open() )
-	{
+	fstream fs(argv[1], std::ios_base::in | std::ios_base::binary);
+	if (!fs.is_open()) {
 		cout << "File doesnt exist" << endl;
 		return 0;
 	}
 	CBinaryStream stream;
-	stream.InitializeFromStream( fs );
+	stream.InitializeFromStream(fs);
 	fs.close();
-	CDotNetFileReader reader( stream );
+	CDotNetFileReader reader(stream);
 	CDotNetClass* pObject = reader.Deserialize();
 
-	if ( pObject )
-	{
-		std::vector<INT32>& arr = pObject->GetInt32Array("StringValue");
+	if (pObject) {
+		CStringVector& test = pObject->GetStringArray("StringValue");
 		delete pObject;
 	}
 
