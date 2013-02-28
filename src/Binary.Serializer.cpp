@@ -29,12 +29,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	fs.close();
 	CDotNetFileReader reader(stream);
 	CDotNetClass* pObject = reader.Deserialize();
-
-	if (pObject) {
-		CStringVector& test = pObject->GetStringArray("StringValue");
-		delete pObject;
-	}
-
+	string sLog;
+	reader.GetLog(sLog);
+	delete pObject;
 	return 0;
 }
 

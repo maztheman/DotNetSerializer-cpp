@@ -13,6 +13,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <sstream>
 
 typedef unsigned char BYTE, *LPBYTE;
 typedef signed char SBYTE, *LPSBYTE;

@@ -9,6 +9,8 @@ class CBinaryStream;
 
 using std::vector;
 using std::map;
+using std::stringstream;
+using std::endl;
 
 class CDotNetFileReader
 {
@@ -17,14 +19,15 @@ public:
 	~CDotNetFileReader(void);
 	//TODO: eventually return a special object that contains all the objects read in.
 	CDotNetClass* Deserialize();
-
+	void GetLog(string& sLog) {
+		sLog = m_Log.str();
+	}
 protected:
 
 	void ReadClass(bool bSystemClass);
 	CDotNetField* ReadField(ESchemaDataType eSchemaDataType,EDataType eDataType);
 	void ReadEnd();
 	void ReadAssembly();
-
 private:
 
 	CBinaryStream& m_Stream;
@@ -32,4 +35,5 @@ private:
 	CDotNetAssemblyPtrMap m_mpAssemblies;
 	CDotNetFieldPtrVector m_arNumber9;
 	vector<CDotNetClass*> m_arCurrentClass;
+	stringstream m_Log;
 };
