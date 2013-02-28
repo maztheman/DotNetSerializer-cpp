@@ -59,6 +59,7 @@ typedef CDotNetGenericField<eDataType_Invalid, CDotNetClass*> CUserClassField;
 typedef CDotNetGenericField<eDataType_Int16, INT16> CInt16Field;
 typedef CDotNetGenericField<eDataType_Int32, INT32> CInt32Field;
 typedef CDotNetGenericField<eDataType_Int64, INT64> CInt64Field;
+typedef CDotNetGenericField<eDataType_DateTime, double> CDateTimeField;
 
 typedef CDotNetGenericField<eDataType_Invalid, CInt32Vector> CInt32ArrayField;
 typedef CDotNetGenericField<eDataType_Invalid, CStringVector> CStringArrayField;

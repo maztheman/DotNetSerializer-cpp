@@ -56,6 +56,11 @@ void CBinaryStream::ReadChars(string& sBuffer, size_t nCount)
 	size_t nBufferIndex = 0;
 	CSByteVector arChars;
 	arChars.reserve(nCount * 3);
+	if (m_arData[m_nIndex + 0] == 0xEF &&
+		m_arData[m_nIndex + 1] == 0xBB &&
+		m_arData[m_nIndex + 2] == 0xBF) {
+		m_nIndex += 3, nCount -= 3;
+	}
 	//Assume UTF-8 Encoding
 	while(m_nIndex < m_nSize)
 	{//Break out when finished
@@ -145,7 +150,7 @@ int CBinaryStream::Read7BitInt()
 	while(nShift != ciMaxShift)//7 loops max
 	{
 		int nTemp = ReadByte();
-		nValue |= nTemp << nShift;
+		nValue |= (nTemp & 0x7F) << nShift;
 		if ((nTemp & 0x80) == 0)
 		{
 			return nValue;

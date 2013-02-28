@@ -76,19 +76,35 @@ void CDotNetFileReader::ReadClass(bool bSystemClass = false)
 			pArrayDataTypes[n] = eArrayDataType_String;
 		} else if (eSchemaDataType == eSchemaDataType_Array) {
 			pDataTypes[n] = static_cast<EDataType>(m_Stream.ReadByte());
+		} else if (eSchemaDataType == eSchemaDataType_GenericObject) {
+			pDataTypes[n] = eDataType_Invalid;
+			m_Stream.ReadString(pDataTypeCodes[n]);//looks like its fully qualified.
 		}
 	}
 	if (!bSystemClass) {
 		oClass.SetUnknownID(m_Stream.ReadInt32());//TODO: figure out why this 2 is here?, looks like on system classes this id is NOT present.
 		//could be user object id
 	}
+	m_Log << "class " << oClass.GetName() << " { " << endl << "public:" << endl;
 	for(INT32 n = 0; n < nFieldCount; n++) {
 		CDotNetField* pField = ReadField(pSchemaTypes[n], pDataTypes[n]);
 		if (pField == nullptr) throw std::exception("Field type is not supported!");
+		if (pSchemaTypes[n] == eSchemaDataType_Array) {
+			m_Log << EnumToString(pDataTypes[n]) << "[] ";
+		} else if (pSchemaTypes[n] == eSchemaDataType_GenericObject ||
+				   pSchemaTypes[n] == eSchemaDataType_SystemObject) {
+			m_Log << pDataTypeCodes[n] << " ";
+		} else if (pSchemaTypes[n] == eSchemaDataType_Normal) {
+			m_Log << EnumToString(pDataTypes[n]) << " ";
+		} else {
+			m_Log << EnumToString(pSchemaTypes[n]) << " " << EnumToString(pDataTypes[n]) << " ";
+		}
+		m_Log << pFieldNames[n] << ";" << endl;
 		pField->SetName(pFieldNames[n]);
 		pField->SetParent(pNewClass);
 		ppFieldValues[n] = pField;
 	}
+	m_Log << "};" << endl;
 	m_mpClasses.insert(std::make_pair(id, pNewClass));
 }
 
@@ -96,7 +112,13 @@ CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDat
 {
 	CDotNetField* pField = nullptr;
 
-	if (eSchemaDataType == eSchemaDataType_StringArray) {
+	if (eSchemaDataType == eSchemaDataType_GenericObject) {//maybe it means string?? or xml document???
+		m_Stream.ReadByte();//6
+		m_Stream.ReadInt32();//3
+		CStringField* pValue = new CStringField;
+		m_Stream.ReadString(pValue->Value());
+		pField = pValue;
+	} else if (eSchemaDataType == eSchemaDataType_StringArray) {
 		m_Stream.ReadByte();//9
 		m_Stream.ReadInt32();//3
 		m_Stream.ReadByte();//0x11
@@ -193,15 +215,22 @@ CDotNetField* CDotNetFileReader::ReadField(ESchemaDataType eSchemaDataType, EDat
 			case eDataType_Int32:
 				{
 					CInt32Field* pIntField = new CInt32Field;
-					pIntField->Value() = m_Stream.ReadInt32() ;
+					pIntField->SetValue(m_Stream.ReadInt32());
 					pField = pIntField;
 				}
 				break;
 			case eDataType_Int64:
 				{
 					CInt64Field* pIntField = new CInt64Field;
-					pIntField->Value() = m_Stream.ReadInt64();
+					pIntField->SetValue(m_Stream.ReadInt64());
 					pField = pIntField;
+				}
+				break;
+			case eDataType_DateTime:
+				{
+					CDateTimeField* pDateField = new CDateTimeField;
+					pDateField->SetValue(m_Stream.ReadDouble());
+					pField = pDateField;
 				}
 				break;
 		}
@@ -239,10 +268,12 @@ void CDotNetFileReader::ReadAssembly()
 	pAssembly->SetID(id);
 	m_Stream.ReadString(pAssembly->Name());
 	m_mpAssemblies.insert(std::make_pair(id, pAssembly));
+	m_Log << "Assembly(" << pAssembly->GetID() << ") " << pAssembly->GetName() << endl;
 }
 
 CDotNetClass* CDotNetFileReader::Deserialize()
 {
+	m_Log << "Deserialize Started..." << endl;
 	bool bContinue = true;
 	{
 		BYTE junk[17] = {0};
@@ -254,8 +285,20 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 		{
 			ESchemaType eSchemaType = static_cast<ESchemaType>(m_Stream.ReadByte());
 
+			m_Log << "Schema Type: " << EnumToString(eSchemaType) << endl;
+
 			switch(eSchemaType)
 			{
+			case eSchemaType_Seven://object?
+				{
+					int nLook = 0;
+					//14 bytes then a string
+					BYTE buff[14] = {0};
+					m_Stream.ReadBytes(buff);
+					string sValue;
+					m_Stream.ReadString(sValue);
+				}
+				break;
 			case eSchemaType_SystemClass:
 				{
 					ReadClass(true);
@@ -295,12 +338,16 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 						CDotNetField* pNewField = nullptr;
 						switch(type)
 						{
+						default:
+							m_Log << "Unsupported Array Type " << EnumToString(type) << endl;
+							break;
 						case eDataType_Int32:
 							{
 								CInt32ArrayField* pValue = new CInt32ArrayField;
 								pNewField = pValue;
 							}
 							break;
+						
 						}
 						CArrayReader* pReader = CArrayReader::GetArrayReaderByType(type, m_Stream);
 						pReader->SetField(pNewField);

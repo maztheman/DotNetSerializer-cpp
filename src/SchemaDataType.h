@@ -8,7 +8,8 @@ enum ESchemaDataType
 	eSchemaDataType_SystemObject = 3,
 	eSchemaDataType_UserDefinedObject = 4,
 	eSchemaDataType_StringArray  = 6,
-	eSchemaDataType_Array  = 7
+	eSchemaDataType_Array  = 7,
+	eSchemaDataType_GenericObject = 2
 };
 
 typedef std::vector<ESchemaDataType> CSchemaDataTypeVector;

@@ -7,6 +7,7 @@ enum EDataType
 	eDataType_Int16 = 7,
 	eDataType_Int32 = 8,
 	eDataType_Int64 = 9,
+	eDataType_DateTime = 13,
 	eDataType_String = 100 //dunno what value is stored, seems as tho it knows implicitly the type by the schema type
 };
 
