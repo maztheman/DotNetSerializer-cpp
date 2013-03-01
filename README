@@ -1,23 +1,28 @@
-This project was compiled in vc++ 2011 dev preview, and most likely 
-wont compile anywhere else until i can test them :>
+Project Summary
+===============
+This project attempts to deserialize a .NET object.  It is written in native c++ with some platform specific stuff.
+I created this project because I could not find any other library that could do what I wanted.
+This project was compiled in vc11 (Visual Studio 2012), however I will try to get other builds in soon...
+
 
 Alpha 0.0.1
 =============
-Support for:
+New stuff:
   * User Classes
   * System Classes
   * Generic Classes
   * Arrays
   * Most primatives (IntXX, Double, DateTime, string)
   * Multiple Serialized Assemblies
+
+Fixed:
+- member references are hooked up properly now.
   
 TODO:
-
-- Add compatibility with MinGW GCC.
-- Add compatibility with GCC.
+- Add build project for MinGW GCC.
+- Add build project for GCC.
 - Add More types (some primatives not supported, but easily added)
 - Make this a LIB not a command line exe, still bundle exec as a example.
 - Clean up code
-- Fix how the member references update
 - Try to reduce allocs
 - Split up the platform specific crap.
