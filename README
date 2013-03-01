@@ -1,10 +1,23 @@
 This project was compiled in vc++ 2011 dev preview, and most likely 
 wont compile anywhere else until i can test them :>
 
+Alpha 0.0.1
+=============
+Support for:
+  * User Classes
+  * System Classes
+  * Generic Classes
+  * Arrays
+  * Most primatives (IntXX, Double, DateTime, string)
+  * Multiple Serialized Assemblies
+  
 TODO:
 
 - Add compatibility with MinGW GCC.
 - Add compatibility with GCC.
-- Add More types
-  * currently only Int16, Int32, Int64 are supported.
+- Add More types (some primatives not supported, but easily added)
 - Make this a LIB not a command line exe, still bundle exec as a example.
+- Clean up code
+- Fix how the member references update
+- Try to reduce allocs
+- Split up the platform specific crap.
