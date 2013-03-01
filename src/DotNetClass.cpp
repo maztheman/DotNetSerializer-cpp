@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "DotNetClass.h"
+#include "UserClassField.h"
 
 #include <algorithm>
 
@@ -9,9 +10,6 @@ CDotNetClass::CDotNetClass(void)
 	, m_nAssemblyID(-1)
 	, m_eArrayType(eArrayType_Invalid)
 	, m_eSchemaType(eSchemaType_Invalid)
-	, m_eElementSchemaDataType(eSchemaDataType_Invalid)
-	, m_eDataType(eDataType_Invalid)
-	, m_nElementAssemblyID(-1)
 	, m_pSchemaClass(nullptr)
 {
 }
@@ -23,9 +21,9 @@ CDotNetClass::~CDotNetClass(void)
 
 size_t CDotNetClass::FindName(string& name)
 {
-	CStringVector::iterator it = find_if(m_arFieldNames.begin(), m_arFieldNames.end(), [&name] (string& left) -> bool
+	CFieldVector::iterator it = find_if(m_arFields.begin(), m_arFields.end(), [&name] (CField& left) -> bool
 	  {
-		string sTemp = left;
+		string sTemp = left.GetName();
 		size_t nIndex = sTemp.find("k__BackingField");
 		if (nIndex != -1) {//auto properties need special work.
 			sTemp.erase(nIndex);
@@ -34,11 +32,9 @@ size_t CDotNetClass::FindName(string& name)
 		}
 		return sTemp == name;
 	});
-
-	if (it != m_arFieldNames.end()) {
-		return std::distance(m_arFieldNames.begin(), it);
+	if (it != m_arFields.end()) {
+		return std::distance(m_arFields.begin(), it);
 	}
-
 	return -1;
 }
 
@@ -85,10 +81,9 @@ CDotNetClass* CDotNetClass::GetObject(string name)
 	size_t nIndex = FindName(name);
 	if (nIndex == -1)
 		return nullptr;
-
 	CDotNetField* pField = m_arFieldValues[nIndex];
 	CUserClassField* pValue = dynamic_cast<CUserClassField*>(pField);
 	if (pValue == nullptr)
 		return nullptr;
-	return pValue->Value();
+	return pValue->GetClassObject();
 }

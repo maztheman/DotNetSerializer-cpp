@@ -5,7 +5,7 @@
 #include "BinaryStream.h"
 #include "DotNetField.h"
 #include "tools.h"
-#include "ArrayReader.h"
+#include "UserClassField.h"
 
 #include <iostream>
 
@@ -17,7 +17,7 @@ CDotNetFileReader::~CDotNetFileReader(void)
 {
 }
 
-bool IsSystemClass(string& sClassName)
+inline bool IsSystemClass(string& sClassName)
 {
 	return sClassName.find("System.") == 0;//starts with System.
 }
@@ -87,7 +87,7 @@ CDotNetField* CDotNetFileReader::ReadPrimative(EDataType eDataType)
 
 CDotNetClass* CDotNetFileReader::ReadClass(bool bSystemClass = false)
 {
-	UINT32 id = m_Stream.ReadInt32();
+	UINT32 id = m_Stream.ReadUInt32();
 	CDotNetClass* pNewClass = new CDotNetClass;
 	CDotNetClass& oClass = *pNewClass;
 	oClass.SetID(id);
@@ -98,82 +98,49 @@ CDotNetClass* CDotNetFileReader::ReadClass(bool bSystemClass = false)
 	if (nFieldCount <= 0) {
 		return pNewClass;
 	}
+	oClass.Fields().resize(nFieldCount);
 	//Resize All Arrays
-	oClass.FieldArrayTypes().resize(nFieldCount, eArrayDataType_Invalid);
-	oClass.FieldNames().resize(nFieldCount);
-	oClass.FieldTypes().resize(nFieldCount, eDataType_Invalid);
-	oClass.FieldTypeCodes().resize(nFieldCount);
 	oClass.FieldValues().resize(nFieldCount, nullptr);
-	oClass.SchemaTypes().resize(nFieldCount, eSchemaDataType_Invalid);
 	oClass.ArraySizes().resize(nFieldCount, -1);
-	EArrayDataType* pArrayDataTypes = GET_DATA(&oClass.FieldArrayTypes());
-	string* pFieldNames = GET_DATA(&oClass.FieldNames());
-	EDataType* pDataTypes = GET_DATA(&oClass.FieldTypes());
-	string* pDataTypeCodes = GET_DATA(&oClass.FieldTypeCodes());
+	auto fields = GET_DATA(&oClass.Fields());
 	CDotNetField** ppFieldValues = GET_DATA(&oClass.FieldValues());
-	ESchemaDataType* pSchemaTypes = GET_DATA(&oClass.SchemaTypes());
 	INT32* pArraySizes = GET_DATA(&oClass.ArraySizes());
+
 	for(INT32 n = 0; n < nFieldCount; n++) {
-		m_Stream.ReadString(pFieldNames[n]);
+		m_Stream.ReadString(fields[n].Name());
 	}
 	for(INT32 n = 0; n < nFieldCount; n++) {//Try to figure out the basic schema type
-		//im guessing this could be a normal type or a user defined type..
-		pSchemaTypes[n] = static_cast<ESchemaDataType>(m_Stream.ReadByte());
+		fields[n].SetSchemaDataType(static_cast<ESchemaDataType>(m_Stream.ReadByte()));
 	}
 	for(INT32 n = 0; n < nFieldCount; n++) {
-		ESchemaDataType eSchemaDataType = pSchemaTypes[n];
+		CField& field = fields[n];
+		ESchemaDataType eSchemaDataType = field.GetSchemaDataType();
 		if (eSchemaDataType == eSchemaDataType_Primitive) {
-			pDataTypes[n] = static_cast<EDataType>(m_Stream.ReadByte());
+			field.SetDataType(static_cast<EDataType>(m_Stream.ReadByte()));
 		} else if (eSchemaDataType == eSchemaDataType_UserDefinedObject) {
-			pDataTypes[n] = eDataType_Invalid;
-			m_Stream.ReadString(pDataTypeCodes[n]);
-			m_Stream.ReadInt32();//assembly id
+			m_Stream.ReadString(field.TypeCode());
+			field.SetAssemblyID(m_Stream.ReadUInt32());
 		} else if (eSchemaDataType == eSchemaDataType_SystemObject) {
-			pDataTypes[n] = eDataType_Invalid;
-			m_Stream.ReadString(pDataTypeCodes[n]);//looks like its fully qualified.
-		} else if (eSchemaDataType == eSchemaDataType_String) {
-		} else if (eSchemaDataType == eSchemaDataType_StringArray) {
-			pDataTypes[n] = eDataType_Invalid;
-			pArrayDataTypes[n] = eArrayDataType_String;
+			m_Stream.ReadString(field.TypeCode());//looks like its fully qualified.
 		} else if (eSchemaDataType == eSchemaDataType_Array) {
-			pDataTypes[n] = static_cast<EDataType>(m_Stream.ReadByte());
-		} else if (eSchemaDataType == eSchemaDataType_Object) {
-			pDataTypes[n] = eDataType_Invalid;
+			field.SetDataType(static_cast<EDataType>(m_Stream.ReadByte()));
 		}
 	}
 	if (!bSystemClass) {
-		oClass.SetAssemblyID(m_Stream.ReadInt32());
-		//m_mpAssemblies[oClass.GetAssemblyID()]->Classes().push_back(pNewClass);
+		oClass.SetAssemblyID(m_Stream.ReadUInt32());
 	}
-	m_Log << "class " << oClass.GetName() << " { " << endl << "public:" << endl;
 	for(INT32 n = 0; n < nFieldCount; n++) {
 		CDotNetField* pField = nullptr;
-		if (pSchemaTypes[n] == eSchemaDataType_Primitive) {
-			pField= ReadPrimative(pDataTypes[n]);
+		CField& field = fields[n];
+		if (field.GetSchemaDataType() == eSchemaDataType_Primitive) {
+			pField = ReadPrimative(field.GetDataType());
 		} else {
 			pField = ReadField();
 		}
-		if (pField == nullptr)
-		{
+		if (pField == nullptr) {
 			throw std::exception("Field type is not supported!");
 		}
-		
-		{
-			if (pSchemaTypes[n] == eSchemaDataType_Array) {
-				m_Log << EnumToString(pDataTypes[n]) << "[] ";
-			} else if (pSchemaTypes[n] == eSchemaDataType_Object ||
-					   pSchemaTypes[n] == eSchemaDataType_SystemObject) {
-				m_Log << pDataTypeCodes[n] << " ";
-			} else if (pSchemaTypes[n] == eSchemaDataType_Primitive) {
-				m_Log << EnumToString(pDataTypes[n]) << " ";
-			} else if (pSchemaTypes[n] == eSchemaDataType_UserDefinedObject) {
-				m_Log << pDataTypeCodes[n] << " ";
-			} else {
-				m_Log << EnumToString(pSchemaTypes[n]) << " " << EnumToString(pDataTypes[n]) << " ";
-			}
-			m_Log << pFieldNames[n] << " = " << pField->ToString() << ";" << endl; 
-		}
-		pField->SetName(pFieldNames[n]);
+		pField->SetName(field.GetName());
 		pField->SetParent(pNewClass);
 		ppFieldValues[n] = pField;
 	}
@@ -183,14 +150,11 @@ CDotNetClass* CDotNetFileReader::ReadClass(bool bSystemClass = false)
 	return pNewClass;
 }
 
-CUserClassField* CDotNetFileReader::ReadMemberReference()
+CMemberReferenceField* CDotNetFileReader::ReadMemberReference()
 {
-	CUserClassField* pUserField = new CUserClassField;
-	CDotNetClass* pClass = new CDotNetClass;
-	pClass->SetID(m_Stream.ReadInt32());
-	pUserField->SetValue(pClass);
-	m_arNumber9.push_back(pUserField);
-	return pUserField;
+	CMemberReferenceField* pMemberRefField = new CMemberReferenceField(m_Stream.ReadUInt32());
+	m_arNumber9.push_back(pMemberRefField);
+	return pMemberRefField;
 }
 
 CDotNetClass* CDotNetFileReader::ReadArray()
@@ -213,16 +177,16 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 	}
 	pArray->FieldValues().resize(nNumOfFields, nullptr);
 	ESchemaDataType eSchemaDataType = static_cast<ESchemaDataType>(m_Stream.ReadByte());
-	pArray->SetElementSchemaDataType(eSchemaDataType);
+	CField& element = pArray->Element();
+	element.SetSchemaDataType(eSchemaDataType);
 	if (eSchemaDataType == eSchemaDataType_UserDefinedObject) {
-		m_Stream.ReadString(pArray->ElementTypeCode());
-		pArray->SetElementAssemblyID(m_Stream.ReadInt32());
+		m_Stream.ReadString(element.TypeCode());
+		element.SetAssemblyID(m_Stream.ReadUInt32());
 	} else if (eSchemaDataType == eSchemaDataType_SystemObject) {
-		m_Stream.ReadString(pArray->ElementTypeCode());
+		m_Stream.ReadString(element.TypeCode());
 	} else if (eSchemaDataType == eSchemaDataType_Primitive) {
 		EDataType eType = static_cast<EDataType>(m_Stream.ReadByte());
-		//so array is a comprised of primitive types of nNumberOfDims demensions each dim is nNumberOfElemsPerDim size
-		pArray->SetElementDataType(eType);
+		element.SetDataType(eType);
 	}
 	bool bContinue = nNumOfFields > 0;
 	UINT32 nCurrentDim = 0;
@@ -235,6 +199,7 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 		case eSchemaType_MemberReference:
 			ppFields[nField] = ReadMemberReference();
 			ppFields[nField]->SetParent(pArray);
+			ppFields[nField]->SetSchemaType(eSchemaType_MemberReference);
 			nField++;
 			nIndex++;
 			break;
@@ -258,7 +223,9 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 		case eSchemaDataType_Array:
 			{
 				CUserClassField* p = new CUserClassField;
-				p->SetValue(ReadArray());
+				auto pArray = ReadArray();
+				p->SetClassObject(pArray);
+				p->SetSchemaType(pArray->GetSchemaType());
 				ppFields[nField] = p;
 				ppFields[nField]->SetParent(pArray);
 				nField++;
@@ -274,6 +241,7 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 				bContinue = false;
 			}
 		} else if (eType == eArrayType_Jagged || eType == eArrayType_MultiDimension) {
+			//this still needs to be tested...
 			if (nIndex > ppArraySizes[nCurrentDim]) {
 				nCurrentDim++;
 			}
@@ -282,7 +250,6 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 			}
 		}
 	}
-
 	return pArray;
 }
 
@@ -290,11 +257,11 @@ CDotNetClass* CDotNetFileReader::ReadArray()
 CDotNetField* CDotNetFileReader::ReadField()
 {
 	static int nArrayFiller = 0;
-	CDotNetField* pField = nullptr;
 	if (nArrayFiller > 0) {
 		nArrayFiller--;
 		return nullptr;
 	}
+	CDotNetField* pField = nullptr;
 	ESchemaType eFieldType = static_cast<ESchemaType>(m_Stream.ReadByte());
 	switch(eFieldType) {
 	default: throw std::exception("Unhandled ReadField Type"); break;	
@@ -303,13 +270,16 @@ CDotNetField* CDotNetFileReader::ReadField()
 		{
 			CUserClassField* pClass = new CUserClassField;
 			CDotNetClass* pSub = ReadArrayItem();
-			pClass->SetValue(pSub);
+			pClass->SetClassObject(pSub);
 			pField = pClass;
 		}
 		break;
 	case eSchemaType_SystemClass:
 		{
-			//value type only?
+			CUserClassField* pClass = new CUserClassField;
+			CDotNetClass* pSub = ReadClass(true);
+			pClass->SetClassObject(pSub);
+			pField = pClass;
 		}
 		break;
 	case eSchemaType_Class:
@@ -317,7 +287,7 @@ CDotNetField* CDotNetFileReader::ReadField()
 		{
 			CUserClassField* pClass = new CUserClassField;
 			CDotNetClass* pSub = ReadClass();
-			pClass->SetValue(pSub);
+			pClass->SetClassObject(pSub);
 			pField = pClass;
 		}
 		break;
@@ -345,135 +315,7 @@ CDotNetField* CDotNetFileReader::ReadField()
 		nArrayFiller = m_Stream.ReadUInt32();
 		break;
 	};
-/*
-
-
-
-
-	if (eSchemaDataType == eSchemaDataType_Object) {//maybe it means string?? or xml document???
-		m_Stream.ReadByte();//6
-		m_Stream.ReadInt32();//3
-		CStringField* pValue = new CStringField;
-		m_Stream.ReadString(pValue->Value());
-		pField = pValue;
-	} else if (eSchemaDataType == eSchemaDataType_StringArray) {
-		m_Stream.ReadByte();//9
-		m_Stream.ReadInt32();//3
-		m_Stream.ReadByte();//0x11
-		m_Stream.ReadInt32();//3
-		CStringArrayField* pValue = new CStringArrayField;
-		INT32 nCount = m_Stream.ReadInt32();
-		CArrayReader* pReader = CArrayReader::GetArrayReaderByType(eDataType_String, m_Stream);
-		pReader->SetField(pValue);
-		for(INT32 i = 0; i < nCount; i++) {
-			pReader->Read();
-		}
-		delete pReader;
-		pField = pValue;
-	} else if (eSchemaDataType == eSchemaDataType_Array) {
-		BYTE byte = m_Stream.ReadByte();
-		if (byte == 9) {//should this be an enum or something?
-			CUserClassField* pUserField = new CUserClassField;
-			pUserField->SetValue(new CDotNetClass);
-			pUserField->Value()->SetID(m_Stream.ReadInt32());
-			pField = pUserField;
-			m_arNumber9.push_back(pUserField);
-		} else {
-			throw std::exception("I dont know what any other type (!9) for the eSchemaDataType_Array could be");
-		}
-		/*m_Stream.ReadByte();//9
-		INT32 nArrayType = m_Stream.ReadInt32();//3
-		if (nArrayType == 4)
-		{
-			m_Stream.ReadInt32();//Real Size
-			m_Stream.ReadInt32();//3
-		}
-		m_Stream.ReadByte();//0xF
-		m_Stream.ReadInt32();//3
-
-		INT32 nCount = m_Stream.ReadInt32();//on system arrays like lists this is the padding count
-		EDataType type = (EDataType)m_Stream.ReadByte();
-
-		switch(type)
-		{
-		case eDataType_Int32:
-			{
-				CInt32ArrayField* pValue = new CInt32ArrayField;
-				pField = pValue;
-			}
-			break;
-		}
-
-		if (nArrayType == 4)
-		{
-			pField->Name() = "_items";
-		}
-
-
-		CArrayReader* pReader = CArrayReader::GetArrayReaderByType(type, m_Stream);
-		pReader->SetField(pField);
-
-		for(INT32 n = 0; n < nCount; n++)
-		{
-			pReader->Read();
-		}
-
-		delete pReader;*/
-/*	} else {
-		switch(eDataType)
-		{
-			case eDataType_Invalid:
-				{
-					BYTE byte = m_Stream.ReadByte();
-					if (byte == 9) {
-						CUserClassField* pUserField = new CUserClassField;
-						pUserField->SetValue(new CDotNetClass);
-						pUserField->Value()->SetID(m_Stream.ReadInt32());
-						pField = pUserField;
-						m_arNumber9.push_back(pUserField);
-					} else {
-						throw std::exception("I dont know what any other type (!9) for the eDataType_Invalid could be");
-					}
-				}
-				break;
-			/*case eDataType_String:
-				{
-					CStringField* pValue = new CStringField;
-					m_Stream.ReadString(pValue->Value());
-					pField = pValue;
-				}
-				break;*/
-			/*case eDataType_Int16:
-				{
-					CInt16Field* pIntField = new CInt16Field;
-					pIntField->SetValue(m_Stream.ReadInt16());
-					pField = pIntField;
-				}
-				break;
-			case eDataType_Int32:
-				{
-					CInt32Field* pIntField = new CInt32Field;
-					pIntField->SetValue(m_Stream.ReadInt32());
-					pField = pIntField;
-				}
-				break;
-			case eDataType_Int64:
-				{
-					CInt64Field* pIntField = new CInt64Field;
-					pIntField->SetValue(m_Stream.ReadInt64());
-					pField = pIntField;
-				}
-				break;
-			case eDataType_DateTime:
-				{
-					CDateTimeField* pDateField = new CDateTimeField;
-					pDateField->SetValue(m_Stream.ReadDouble());
-					pField = pDateField;
-				}
-				break;
-		}
-	}*/
-
+	pField->SetSchemaType(eFieldType);
 	return pField;
 }
 
@@ -481,18 +323,23 @@ void CDotNetFileReader::ReadEnd()
 {
 	size_t nSize = m_arNumber9.size();
 	if (nSize > 0) {
-		CDotNetField** pFields = GET_DATA(&m_arNumber9);
+		auto pFields = GET_DATA(&m_arNumber9);
+		string sName;
+		sName.reserve(256);
 		for(size_t i = 0; i < nSize; i++) {
-			CUserClassField* pField = dynamic_cast<CUserClassField*>(pFields[i]);
-			if (pField == nullptr) continue;
+			auto pField = pFields[i];
 			CDotNetClass* pParent = pField->GetParent();
-			CDotNetClassPtrMap::iterator itFound = m_mpClasses.find(pField->GetValue()->GetID());
+			CDotNetClassPtrMap::iterator itFound = m_mpClasses.find(pField->GetReferenceID());
 			if (itFound != m_mpClasses.end()) {
-				size_t index = pParent->GetFieldValues().GetIndexByID(pField->GetValue()->GetID());
-				CUserClassField* pRemoveField = dynamic_cast<CUserClassField*>(pParent->FieldValues()[index]);//TODO: see if you can static cast this....
-				if (pRemoveField == nullptr) continue;
-				delete pRemoveField->Value();
-				pRemoveField->SetValue(itFound->second);
+				auto ppParentFieldValues = GET_DATA(&pParent->FieldValues());
+				auto index = pParent->GetFieldValues().GetIndexByID(pField->GetReferenceID());
+				sName = ppParentFieldValues[index]->GetName();
+				delete ppParentFieldValues[index];
+				CUserClassField* pNewClass = new CUserClassField(itFound->second);
+				ppParentFieldValues[index] = pNewClass;
+				pNewClass->SetSchemaType(pNewClass->GetClassObject()->GetSchemaType());
+				pNewClass->SetParent(pParent);
+				pNewClass->SetName(sName);
 			}
 		}
 		m_arNumber9.clear();
@@ -501,7 +348,7 @@ void CDotNetFileReader::ReadEnd()
 
 void CDotNetFileReader::ReadAssembly()
 {
-	INT32 id = m_Stream.ReadInt32();
+	UINT32 id = m_Stream.ReadUInt32();
 	CDotNetAssembly* pAssembly = new CDotNetAssembly;
 	pAssembly->SetID(id);
 	m_Stream.ReadString(pAssembly->Name());
@@ -520,42 +367,22 @@ CDotNetClass* CDotNetFileReader::ReadArrayItem()
 	auto pRefClass = pMapItem->second;
 	INT32 nFieldCount = pRefClass->GetFieldCount();
 	pClass->SetSchemaReferenceClass(pRefClass);
-
-	auto pSchemaTypes = GET_DATA(&pRefClass->SchemaTypes());
-	auto pDataTypes = GET_DATA(&pRefClass->FieldTypes());
-	auto pDataTypeCodes = GET_DATA(&pRefClass->FieldTypeCodes());
-	auto pFieldNames = GET_DATA(&pRefClass->FieldNames());
+	auto fields = GET_DATA(&pRefClass->Fields());
 	pClass->FieldValues().resize(nFieldCount, nullptr);
 	auto ppFieldValues = GET_DATA(&pClass->FieldValues());
-
 	for(int i = 0; i < nFieldCount; i++) {
+		CField& field = fields[i];
 		CDotNetField* pField = nullptr;
-		if (pSchemaTypes[i] == eSchemaDataType_Primitive) {
-			pField = ReadPrimative(pDataTypes[i]);
+		if (field.GetSchemaDataType() == eSchemaDataType_Primitive) {
+			pField = ReadPrimative(field.GetDataType());
 		} else {
 			pField = ReadField();
 		}
 		if (pField == nullptr) throw std::exception("Field type is not supported!");
-		{
-			if (pSchemaTypes[i] == eSchemaDataType_Array) {
-				m_Log << EnumToString(pDataTypes[i]) << "[] ";
-			} else if (pSchemaTypes[i] == eSchemaDataType_Object ||
-					   pSchemaTypes[i] == eSchemaDataType_SystemObject) {
-				m_Log << pDataTypeCodes[i] << " ";
-			} else if (pSchemaTypes[i] == eSchemaDataType_Primitive) {
-				m_Log << EnumToString(pDataTypes[i]) << " ";
-			} else if (pSchemaTypes[i] == eSchemaDataType_UserDefinedObject) {
-				m_Log << pDataTypeCodes[i] << " ";
-			} else {
-				m_Log << EnumToString(pSchemaTypes[i]) << " " << EnumToString(pDataTypes[i]) << " ";
-			}
-			m_Log << pFieldNames[i] << " = " << pField->ToString() << ";" << endl; 
-		}
-		pField->SetName(pFieldNames[i]);
+		pField->SetName(field.GetName());
 		pField->SetParent(pClass);
 		ppFieldValues[i] = pField;
 	}
-
 	return pClass;
 }
 
@@ -570,51 +397,52 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 	{
 		BYTE junk[17] = {0};
 		m_Stream.ReadBytes(junk);
+		//signature here i will add check in later
 	}
-	try
-	{
+	try {
 		string sName;
-		while (bContinue)
-		{
+		while (bContinue) {
 			ESchemaType eSchemaType = static_cast<ESchemaType>(m_Stream.ReadByte());
-
 			m_Log << "Schema Type: " << EnumToString(eSchemaType) << endl;
-
 			switch(eSchemaType)
 			{
+			default: m_Log << "Not Implemented Schema Type '" << EnumToString(eSchemaType) << "' (" << (int)eSchemaType << ")" << endl; break;
 			case eSchemaType_ArrayItem:
-				{
-					ReadArrayItem();
-				}
+				ReadArrayItem();
 				break;
 			case eSchemaType_BinaryArray:
-				{
-					ReadArray();
-				}
+				ReadArray();
 				break;
 			case eSchemaType_SystemClass:
-				{
-					ReadClass(true);
-				}
+				ReadClass(true);
 				break;
 			case eSchemaType_Class:
-				{//class
-					ReadClass();
-				}
+				ReadClass();
 				break;
 			case eSchemaType_End:
-				{//assembly end or object end
-					ReadEnd();
-					bContinue = false;
-				}
+				ReadEnd();
+				bContinue = false;
 				break;
 				//must mean assembly
 			case eSchemaType_Assembly:
-				{
-					ReadAssembly();
-				}
+				ReadAssembly();
 				break;
-			case eSchemaType_FieldRef:
+			}
+		}
+	} catch(std::exception& e) {
+		std::cout << "Error caught! -->" << e.what() << "<--" << std::endl;
+	}
+	if (m_arCurrentClass.size() > 0) {
+		m_mpClasses.clear();
+		m_arNumber9.SetDeleteMemory(false);
+		return m_arCurrentClass[0];
+	}
+	return nullptr;
+}
+
+/*
+unused code, prolly garbage:
+case eSchemaType_FieldRef:
 				{
 					INT32 refId = m_Stream.ReadInt32();
 					size_t nIndex = m_arNumber9.GetIndexByID(refId);
@@ -656,15 +484,4 @@ CDotNetClass* CDotNetFileReader::Deserialize()
 					m_arNumber9.erase(m_arNumber9.begin() + nIndex);
 				}
 				break;
-			}
-		}
-	} catch(std::exception& e) {
-		std::cout << "Error caught! -->" << e.what() << "<--" << std::endl;
-	}
-	if (m_arCurrentClass.size() > 0) {
-		m_mpClasses.clear();
-		m_arNumber9.SetDeleteMemory(false);
-		return m_arCurrentClass[0];
-	}
-	return nullptr;
-}
+*/

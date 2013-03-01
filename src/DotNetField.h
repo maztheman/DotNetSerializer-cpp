@@ -1,5 +1,6 @@
 #pragma once
 #include "DataType.h"
+#include "SchemaType.h"
 #include <string>
 #include <sstream>
 
@@ -11,6 +12,7 @@ class CDotNetClass;
 class CDotNetField
 {
 	PROPERTY(ObjectID, UINT32, m_uiObjectID)
+	PROPERTY(SchemaType, ESchemaType, m_eSchemaType)
 public:
 	CDotNetField(void);
 	virtual ~CDotNetField(void);
@@ -90,7 +92,7 @@ string CDotNetGenericField<eDataType_Invalid, CInt32Vector>::do_ToString() const
 }
 
 
-typedef CDotNetGenericField<eDataType_Invalid, CDotNetClass*> CUserClassField;
+//typedef CDotNetGenericField<eDataType_Invalid, CDotNetClass*> CUserClassField;
 typedef CDotNetGenericField<eDataType_Int16, INT16> CInt16Field;
 typedef CDotNetGenericField<eDataType_Int32, INT32> CInt32Field;
 typedef CDotNetGenericField<eDataType_Int64, INT64> CInt64Field;
@@ -113,7 +115,7 @@ public:
 			ResetContent();
 	}
 	void SetDeleteMemory(bool bDeleteMemory) { m_bDeleteMemory = bDeleteMemory; }
-	size_t GetIndexByID(INT32 id) const;
+	size_t GetIndexByID(UINT32 id) const;
 	void ResetContent()
 	{
 		if (size() == 0) return;

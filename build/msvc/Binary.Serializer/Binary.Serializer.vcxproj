@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\ArrayReader.h" />
     <ClInclude Include="..\..\..\src\ArrayType.h" />
     <ClInclude Include="..\..\..\src\BinaryStream.h" />
     <ClInclude Include="..\..\..\src\DataType.h" />
@@ -19,14 +18,15 @@
     <ClInclude Include="..\..\..\src\DotNetClass.h" />
     <ClInclude Include="..\..\..\src\DotNetField.h" />
     <ClInclude Include="..\..\..\src\DotNetFileReader.h" />
+    <ClInclude Include="..\..\..\src\MemberReferenceField.h" />
     <ClInclude Include="..\..\..\src\SchemaDataType.h" />
     <ClInclude Include="..\..\..\src\SchemaType.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\targetver.h" />
     <ClInclude Include="..\..\..\src\tools.h" />
+    <ClInclude Include="..\..\..\src\UserClassField.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\ArrayReader.cpp" />
     <ClCompile Include="..\..\..\src\Binary.Serializer.cpp" />
     <ClCompile Include="..\..\..\src\BinaryStream.cpp" />
     <ClCompile Include="..\..\..\src\DotNetAssembly.cpp" />
@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\..\src\DotNetFileReader.cpp" />
     <ClCompile Include="..\..\..\src\stdafx.cpp" />
     <ClCompile Include="..\..\..\src\tools.cpp" />
+    <ClCompile Include="..\..\..\src\UserClassField.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>

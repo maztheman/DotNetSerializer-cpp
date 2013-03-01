@@ -4,8 +4,10 @@
 #include "DotNetClass.h"
 #include "DotNetField.h"
 #include "DotNetAssembly.h"
+#include "MemberReferenceField.h"
 
 class CBinaryStream;
+
 
 using std::vector;
 using std::map;
@@ -30,14 +32,14 @@ protected:
 	void ReadAssembly();
 	CDotNetClass* ReadArray();
 	CDotNetClass* ReadArrayItem();
-	CUserClassField* ReadMemberReference();
+	CMemberReferenceField* ReadMemberReference();
 	CDotNetField* ReadPrimative(EDataType eDataType);
 private:
 
 	CBinaryStream& m_Stream;
 	CDotNetClassPtrMap m_mpClasses;
 	CDotNetAssemblyPtrMap m_mpAssemblies;
-	CDotNetFieldPtrVector m_arNumber9;
+	CMemberReferenceFieldPtrVector m_arNumber9;
 	vector<CDotNetClass*> m_arCurrentClass;
 	stringstream m_Log;
 };

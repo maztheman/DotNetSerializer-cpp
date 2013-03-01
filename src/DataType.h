@@ -21,13 +21,4 @@ enum EDataType
 	eDataType_String		= 0x12,
 };
 
-enum EArrayDataType
-{
-	eArrayDataType_Invalid = -1,
-	eArrayDataType_Double = 6,
-	eArrayDataType_Int32 = 8,
-	eArrayDataType_String = 9
-};
-
 typedef std::vector<EDataType> CDataTypeVector;
-typedef std::vector<EArrayDataType> CArrayDataTypeVector;

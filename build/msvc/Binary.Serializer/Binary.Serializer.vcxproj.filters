@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\ArrayReader.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\BinaryStream.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -40,6 +37,12 @@
     <ClInclude Include="..\..\..\src\ArrayType.h">
       <Filter>Headers\Enums</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\MemberReferenceField.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\UserClassField.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -53,9 +56,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\ArrayReader.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Binary.Serializer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -78,6 +78,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\tools.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\UserClassField.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

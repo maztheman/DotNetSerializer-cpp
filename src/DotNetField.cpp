@@ -1,8 +1,12 @@
 #include "StdAfx.h"
 #include "DotNetField.h"
 #include "DotNetClass.h"
+#include "UserClassField.h"
+#include "MemberReferenceField.h"
 
 CDotNetField::CDotNetField(void)
+	: m_uiObjectID(-1)
+	, m_eSchemaType(eSchemaType_Invalid)
 {
 }
 
@@ -25,16 +29,15 @@ string CDotNetField::ToString() const
 	return do_ToString();
 }
 
-size_t CDotNetFieldPtrVector::GetIndexByID(INT32 id) const
+size_t CDotNetFieldPtrVector::GetIndexByID(UINT32 id) const
 {
 	CDotNetField* const* pData = &front();
 	for(size_t i = 0; i < size(); i++) {
-		if (pData[i]->Type() != eDataType_Invalid) continue;
-		CUserClassField* pValue = dynamic_cast<CUserClassField*>(pData[i]);
-		if (pValue && pValue->GetValue()->GetID() == id) {
+		if (pData[i] == nullptr || pData[i]->GetSchemaType() != eSchemaType_MemberReference) continue;
+		CMemberReferenceField* pValue = static_cast<CMemberReferenceField*>(pData[i]);
+		if (pValue->GetReferenceID() == id) {
 			return i;
 		}
 	}
-
 	return -1;
 }

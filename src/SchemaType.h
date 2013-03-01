@@ -220,7 +220,7 @@ From: http://msdn.microsoft.com/en-us/library/cc236994.aspx
 //Like BinaryHeaderEnum
 enum ESchemaType
 {
-	eSchemaType_Invalid						= -1,
+	eSchemaType_Invalid						=   -1,
 	eSchemaType_SerializedStreamHeader		= 0x00,
 	eSchemaType_ArrayItem					= 0x01,
 	eSchemaType_SystemClass					= 0x04,
@@ -232,11 +232,11 @@ enum ESchemaType
 	eSchemaType_ObjectNull					= 0x0A,
 	eSchemaType_End							= 0x0B,
 	eSchemaType_Assembly					= 0x0C,
-	eSchemaType_FieldRef					= 0x0F,
-	eSchemaType_ArraySingleObject			= 0x10,
 	eSchemaType_ArrayFiller8b				= 0x0D,
 	eSchemaType_ArrayFiller32b				= 0x0E,
-	eSchemaType_MessageEnd					= 0x11,//related to 0x15
+	eSchemaType_ArrayOfPrimitiveType		= 0x0F,
+	eSchemaType_ArrayOfObject				= 0x10,
+	eSchemaType_ArrayOfString				= 0x11,
 	eSchemaType_BinaryMethodCall			= 0x15,
 	eSchemaType_BinaryMethodReturn			= 0x16,
 };

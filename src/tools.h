@@ -2,6 +2,7 @@
 #include "DataType.h"
 #include "SchemaDataType.h"
 #include "SchemaType.h"
+#include "ArrayType.h"
 
 using std::string;
 
@@ -13,7 +14,7 @@ INT32 ToInt32(BYTE* pBuffer);
 #define GET_DATA(x) &((*(x)).front());
 #endif
 
+const string& EnumToString(EArrayType eValue);
 const string& EnumToString(ESchemaDataType eValue);
 const string& EnumToString(EDataType eValue);
-const string& EnumToString(EArrayDataType eValue);
 const string& EnumToString(ESchemaType eValue);

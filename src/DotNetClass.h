@@ -9,25 +9,35 @@
 using std::vector;
 using std::map;
 
+class CField
+{
+	PROPERTY(Name, string, m_sName)
+	PROPERTY(DataType, EDataType, m_eDataType)
+	PROPERTY(TypeCode, string, m_sTypeCode)
+	PROPERTY(SchemaDataType, ESchemaDataType, m_eSchemaDataType)
+	PROPERTY(AssemblyID, UINT32, m_uiAssemblyID)
+public:
+	CField()
+		: m_eDataType(eDataType_Invalid)
+		, m_eSchemaDataType(eSchemaDataType_Invalid)
+		, m_uiAssemblyID(-1)
+	{}
+};
+
+typedef std::vector<CField> CFieldVector;
+
 class CDotNetClass
 {
 	PROPERTY(ID, UINT32, m_nId)
 	PROPERTY(Name, string, m_sName)
 	PROPERTY(FieldCount, INT32, m_nFieldCount)
-	PROPERTY_OBJ(FieldNames, CStringVector, m_arFieldNames)
-	PROPERTY_OBJ(FieldTypes, CDataTypeVector, m_arFieldTypes)
-	PROPERTY_OBJ(FieldTypeCodes, CStringVector, m_arFieldTypeCodes)
-	PROPERTY_OBJ(FieldArrayTypes, CArrayDataTypeVector, m_arArrayTypes)
+	PROPERTY_OBJ(Fields, CFieldVector, m_arFields)
 	PROPERTY_OBJ(ArraySizes, CInt32Vector, m_arArraySizes)
-	PROPERTY_OBJ(SchemaTypes, CSchemaDataTypeVector, m_arSchemaTypes)
 	PROPERTY_OBJ(FieldValues, CDotNetFieldPtrVector, m_arFieldValues)
 	PROPERTY(AssemblyID, INT32, m_nAssemblyID)
 	PROPERTY(ArrayType, EArrayType, m_eArrayType)
 	PROPERTY(SchemaType, ESchemaType, m_eSchemaType)
-	PROPERTY(ElementSchemaDataType, ESchemaDataType, m_eElementSchemaDataType)
-	PROPERTY(ElementDataType, EDataType, m_eDataType)
-	PROPERTY(ElementTypeCode, string, m_sElementTypeCode)
-	PROPERTY(ElementAssemblyID, INT32, m_nElementAssemblyID)
+	PROPERTY(Element, CField, m_Element)
 	PROPERTY_PTR(SchemaReferenceClass, CDotNetClass*, m_pSchemaClass)
 
 public:
