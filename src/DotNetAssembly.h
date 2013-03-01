@@ -3,11 +3,13 @@
 using std::string;
 using std::map;
 
+class CDotNetClass;
+
 class CDotNetAssembly
 {
 	PROPERTY(ID, INT32, m_nID)
 	PROPERTY(Name, string, m_sName)
-
+	PROPERTY(Classes, std::vector<CDotNetClass*>, m_arClasses)
 public:
 	CDotNetAssembly(void);
 	~CDotNetAssembly(void);

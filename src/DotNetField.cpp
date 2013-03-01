@@ -20,13 +20,18 @@ CDotNetClass* CDotNetField::GetParent()
 	return m_pParentClass;
 }
 
+string CDotNetField::ToString() const
+{
+	return do_ToString();
+}
+
 size_t CDotNetFieldPtrVector::GetIndexByID(INT32 id) const
 {
 	CDotNetField* const* pData = &front();
 	for(size_t i = 0; i < size(); i++) {
 		if (pData[i]->Type() != eDataType_Invalid) continue;
 		CUserClassField* pValue = dynamic_cast<CUserClassField*>(pData[i]);
-		if (pValue && pValue->Value()->ID() == id) {
+		if (pValue && pValue->GetValue()->GetID() == id) {
 			return i;
 		}
 	}

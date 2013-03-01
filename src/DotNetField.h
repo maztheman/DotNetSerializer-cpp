@@ -1,12 +1,16 @@
 #pragma once
 #include "DataType.h"
+#include <string>
+#include <sstream>
 
 using std::string;
+using std::stringstream;
 
 class CDotNetClass;
 
 class CDotNetField
 {
+	PROPERTY(ObjectID, UINT32, m_uiObjectID)
 public:
 	CDotNetField(void);
 	virtual ~CDotNetField(void);
@@ -20,9 +24,12 @@ public:
 	void SetParent(CDotNetClass* pParent);
 	CDotNetClass* GetParent();
 
+	string ToString() const;
+
 private:
 	string m_sName;
-	CDotNetClass* m_pParentClass; 
+	CDotNetClass* m_pParentClass;
+	virtual string do_ToString() const = 0;
 
 private:
 	CDotNetField(const CDotNetField&);
@@ -51,15 +58,45 @@ public:
 	}
 
 private:
+	virtual string do_ToString() const {
+		std::stringstream ss;
+		std::string s;
+		ss << GetValue();
+		s = ss.str();
+		return s;
+	}
 
 	VALUE_TYPE m_Value;
 };
+
+template<>
+string CDotNetGenericField<eDataType_Invalid, CStringVector>::do_ToString() const {
+	std::stringstream ss;
+	for(auto& s : m_Value) {
+		ss << s << ",";
+	}
+	string sVal = ss.str();
+	return sVal;
+}
+
+template<>
+string CDotNetGenericField<eDataType_Invalid, CInt32Vector>::do_ToString() const {
+	std::stringstream ss;
+	for(auto& s : m_Value) {
+		ss << s << ",";
+	}
+	string sVal = ss.str();
+	return sVal;
+}
+
 
 typedef CDotNetGenericField<eDataType_Invalid, CDotNetClass*> CUserClassField;
 typedef CDotNetGenericField<eDataType_Int16, INT16> CInt16Field;
 typedef CDotNetGenericField<eDataType_Int32, INT32> CInt32Field;
 typedef CDotNetGenericField<eDataType_Int64, INT64> CInt64Field;
 typedef CDotNetGenericField<eDataType_DateTime, double> CDateTimeField;
+typedef CDotNetGenericField<eDataType_Double, double> CDoubleField;
+typedef CDotNetGenericField<eDataType_Boolean, bool> CBooleanField;
 
 typedef CDotNetGenericField<eDataType_Invalid, CInt32Vector> CInt32ArrayField;
 typedef CDotNetGenericField<eDataType_Invalid, CStringVector> CStringArrayField;

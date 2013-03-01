@@ -46,3 +46,10 @@ type var;\
 public:\
 type& name () { return var; }\
 const type& Get ## name () const { return var; }
+
+#define PROPERTY_PTR(name, type, var)\
+private:\
+type var;\
+public:\
+void Set ## name (type value) { var = value; }\
+type Get ## name () const { return var; }

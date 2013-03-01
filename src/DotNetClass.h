@@ -3,13 +3,15 @@
 #include "DataType.h"
 #include "SchemaDataType.h"
 #include "DotNetField.h"
+#include "ArrayType.h"
+#include "SchemaType.h"
 
 using std::vector;
 using std::map;
 
 class CDotNetClass
 {
-	PROPERTY(ID, INT32, m_nId)
+	PROPERTY(ID, UINT32, m_nId)
 	PROPERTY(Name, string, m_sName)
 	PROPERTY(FieldCount, INT32, m_nFieldCount)
 	PROPERTY_OBJ(FieldNames, CStringVector, m_arFieldNames)
@@ -19,7 +21,14 @@ class CDotNetClass
 	PROPERTY_OBJ(ArraySizes, CInt32Vector, m_arArraySizes)
 	PROPERTY_OBJ(SchemaTypes, CSchemaDataTypeVector, m_arSchemaTypes)
 	PROPERTY_OBJ(FieldValues, CDotNetFieldPtrVector, m_arFieldValues)
-	PROPERTY(UnknownID, INT32, m_nUnknownID)
+	PROPERTY(AssemblyID, INT32, m_nAssemblyID)
+	PROPERTY(ArrayType, EArrayType, m_eArrayType)
+	PROPERTY(SchemaType, ESchemaType, m_eSchemaType)
+	PROPERTY(ElementSchemaDataType, ESchemaDataType, m_eElementSchemaDataType)
+	PROPERTY(ElementDataType, EDataType, m_eDataType)
+	PROPERTY(ElementTypeCode, string, m_sElementTypeCode)
+	PROPERTY(ElementAssemblyID, INT32, m_nElementAssemblyID)
+	PROPERTY_PTR(SchemaReferenceClass, CDotNetClass*, m_pSchemaClass)
 
 public:
 	CDotNetClass(void);
@@ -66,7 +75,7 @@ protected:
 	}
 };
 
-class CDotNetClassPtrMap : public std::map<INT32, CDotNetClass*>
+class CDotNetClassPtrMap : public std::map<UINT32, CDotNetClass*>
 {
 public:
 	CDotNetClassPtrMap() {}

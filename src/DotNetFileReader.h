@@ -24,10 +24,14 @@ public:
 	}
 protected:
 
-	void ReadClass(bool bSystemClass);
-	CDotNetField* ReadField(ESchemaDataType eSchemaDataType,EDataType eDataType);
+	CDotNetClass* ReadClass(bool bSystemClass);
+	CDotNetField* ReadField();
 	void ReadEnd();
 	void ReadAssembly();
+	CDotNetClass* ReadArray();
+	CDotNetClass* ReadArrayItem();
+	CUserClassField* ReadMemberReference();
+	CDotNetField* ReadPrimative(EDataType eDataType);
 private:
 
 	CBinaryStream& m_Stream;

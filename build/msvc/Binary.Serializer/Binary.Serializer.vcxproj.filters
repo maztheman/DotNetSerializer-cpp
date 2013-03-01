@@ -7,9 +7,6 @@
     <ClInclude Include="..\..\..\src\BinaryStream.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\DataType.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\DotNetAssembly.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -22,12 +19,6 @@
     <ClInclude Include="..\..\..\src\DotNetFileReader.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SchemaDataType.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\SchemaType.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -37,6 +28,18 @@
     <ClInclude Include="..\..\..\src\tools.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\SchemaDataType.h">
+      <Filter>Headers\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SchemaType.h">
+      <Filter>Headers\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DataType.h">
+      <Filter>Headers\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ArrayType.h">
+      <Filter>Headers\Enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -44,6 +47,9 @@
     </Filter>
     <Filter Include="Sources">
       <UniqueIdentifier>{74c53a54-b41d-4d09-8de1-40abcc4ec54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Enums">
+      <UniqueIdentifier>{2442ccbc-ba43-4cb8-82e5-f219d5b7c38d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

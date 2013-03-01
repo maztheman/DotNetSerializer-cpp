@@ -27,13 +27,14 @@ const string& EnumToString(ESchemaDataType eValue)
 	static map<ESchemaDataType, string> aEnumMap;
 	if (aEnumMap.empty()) {
  		aEnumMap.insert(make_pair(eSchemaDataType_Invalid, "Invalid"));
-		aEnumMap.insert(make_pair(eSchemaDataType_Normal, "Normal"));
+		aEnumMap.insert(make_pair(eSchemaDataType_Primitive, "Primitive"));
 		aEnumMap.insert(make_pair(eSchemaDataType_String, "String"));
 		aEnumMap.insert(make_pair(eSchemaDataType_SystemObject, "System Object"));
 		aEnumMap.insert(make_pair(eSchemaDataType_UserDefinedObject, "User Defined Object"));
 		aEnumMap.insert(make_pair(eSchemaDataType_StringArray, "String Array"));
 		aEnumMap.insert(make_pair(eSchemaDataType_Array, "Array"));
-		aEnumMap.insert(make_pair(eSchemaDataType_GenericObject, "???Generic Object???"));
+		aEnumMap.insert(make_pair(eSchemaDataType_Object, "Object"));
+		aEnumMap.insert(make_pair(eSchemaDataType_ObjectArray, "Object Array"));
 	}
 	return FindAndSendBack(aEnumMap, "Schema Data Type", eValue); 
 }
@@ -70,10 +71,11 @@ const string& EnumToString(ESchemaType eValue)
 	if (aEnumMap.empty()) {
 		aEnumMap.insert(make_pair(eSchemaType_SystemClass, "System Class"));
 		aEnumMap.insert(make_pair(eSchemaType_Class, "Class"));
-		aEnumMap.insert(make_pair(eSchemaType_Seven, "??Seven??"));
+		aEnumMap.insert(make_pair(eSchemaType_BinaryArray, "Binary Array"));
 		aEnumMap.insert(make_pair(eSchemaType_End, "End"));
 		aEnumMap.insert(make_pair(eSchemaType_Assembly, "Assembly"));
 		aEnumMap.insert(make_pair(eSchemaType_FieldRef, "FieldRef"));
+		aEnumMap.insert(make_pair(eSchemaType_ArrayItem, "Array Item"));
 	}
 	return FindAndSendBack(aEnumMap, "Schema Type", eValue); 
 }

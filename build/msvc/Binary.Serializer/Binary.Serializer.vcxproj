@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\ArrayReader.h" />
+    <ClInclude Include="..\..\..\src\ArrayType.h" />
     <ClInclude Include="..\..\..\src\BinaryStream.h" />
     <ClInclude Include="..\..\..\src\DataType.h" />
     <ClInclude Include="..\..\..\src\DotNetAssembly.h" />

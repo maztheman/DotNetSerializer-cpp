@@ -4,6 +4,15 @@
 #include <algorithm>
 
 CDotNetClass::CDotNetClass(void)
+	: m_nId(-1)
+	, m_nFieldCount(-1)
+	, m_nAssemblyID(-1)
+	, m_eArrayType(eArrayType_Invalid)
+	, m_eSchemaType(eSchemaType_Invalid)
+	, m_eElementSchemaDataType(eSchemaDataType_Invalid)
+	, m_eDataType(eDataType_Invalid)
+	, m_nElementAssemblyID(-1)
+	, m_pSchemaClass(nullptr)
 {
 }
 
