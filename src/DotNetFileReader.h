@@ -24,6 +24,8 @@ public:
 	void GetLog(string& sLog) {
 		sLog = m_Log.str();
 	}
+
+	const vector<CDotNetClass*>& Types() const { return m_Types; }
 protected:
 
 	CDotNetClass* ReadClass(bool bSystemClass);
@@ -41,5 +43,6 @@ private:
 	CDotNetAssemblyPtrMap m_mpAssemblies;
 	CMemberReferenceFieldPtrVector m_arNumber9;
 	vector<CDotNetClass*> m_arCurrentClass;
+	vector<CDotNetClass*> m_Types;
 	stringstream m_Log;
 };

@@ -93,6 +93,7 @@ CDotNetClass* CDotNetFileReader::ReadClass(bool bSystemClass = false)
 	oClass.SetID(id);
 	m_Stream.ReadString(oClass.Name());
 	m_arCurrentClass.push_back(pNewClass);
+	m_Types.push_back(pNewClass);
 	oClass.SetFieldCount(m_Stream.ReadInt32());
 	INT32 nFieldCount = oClass.GetFieldCount();
 	if (nFieldCount <= 0) {

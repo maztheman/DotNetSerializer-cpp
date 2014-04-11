@@ -82,53 +82,101 @@ void CBinaryStream::ReadChars(string& sBuffer, size_t nCount)
 	sBuffer.assign(arChars.begin(), arChars.end());
 }
 
+union long_double_u
+{
+	BYTE buffer[16];
+	long double value;
+};
+
+union double_u
+{
+	BYTE buffer[8];
+	double value;
+};
+
+union float_u
+{
+	BYTE buffer[4];
+	float value;
+};
+
+union int16_u
+{
+	BYTE buffer[2];
+	int16_t value;
+};
+
+union int32_u
+{
+	BYTE buffer[4];
+	int32_t value;
+};
+
+union int64_u
+{
+	BYTE buffer[8];
+	int64_t value;
+};
+
+union uint16_u
+{
+	BYTE buffer[2];
+	uint16_t value;
+};
+
+union uint32_u
+{
+	BYTE buffer[4];
+	uint32_t value;
+};
+
+union uint64_u
+{
+	BYTE buffer[8];
+	uint64_t value;
+};
+
 long double CBinaryStream::ReadDecimal()
 {
 	int nSize = sizeof(long double);
-	BYTE buffer[16] = {0};
-	ReadIntoBuffer(buffer);
-	return *reinterpret_cast<long double * const>(&buffer[16 - nSize]);
+	long_double_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 double CBinaryStream::ReadDouble()
 {
-	BYTE buffer[8] = {0};
-	ReadIntoBuffer(buffer);
-	UINT32 n1 = (static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8) | (static_cast<INT32>(buffer[2]) << 16) | (static_cast<INT32>(buffer[3]) << 24));
-	UINT32 n2 = (static_cast<INT32>(buffer[4]) | (static_cast<INT32>(buffer[5]) << 8) | (static_cast<INT32>(buffer[6]) << 16) | (static_cast<INT32>(buffer[7]) << 24));
-	UINT64 n3 = static_cast<INT64>(n1) | (static_cast<UINT64>(n1) << 32);
-	return *(reinterpret_cast<double*>(&n3));
+	double_u value;
+	ReadIntoBuffer(value.buffer);
+	return value.value;
 }
 
 float CBinaryStream::ReadFloat()
 {
-	BYTE buffer[4] = {0};
-	ReadIntoBuffer(buffer);
-	UINT32 n1 = (static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8) | (static_cast<INT32>(buffer[2]) << 16) | (static_cast<INT32>(buffer[3]) << 24));
-	return *(reinterpret_cast<float*>(&n1));
+	float_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 INT16 CBinaryStream::ReadInt16()
 {
-	BYTE buffer[2] = {0};
-	ReadIntoBuffer(buffer);
-	return static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8);
+	int16_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 INT32 CBinaryStream::ReadInt32()
 {
-	BYTE buffer[4] = {0};
-	ReadIntoBuffer(buffer);
-	return (static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8) | (static_cast<INT32>(buffer[2]) << 16) | (static_cast<INT32>(buffer[3]) << 24));
+	int32_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 INT64 CBinaryStream::ReadInt64()
 {
-	BYTE buffer[8] = {0};
-	ReadIntoBuffer(buffer);
-	UINT32 n1 = (static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8) | (static_cast<INT32>(buffer[2]) << 16) | (static_cast<INT32>(buffer[3]) << 24));
-	UINT32 n2 = (static_cast<INT32>(buffer[4]) | (static_cast<INT32>(buffer[5]) << 8) | (static_cast<INT32>(buffer[6]) << 16) | (static_cast<INT32>(buffer[7]) << 24));
-	return static_cast<INT64>(n1) | (static_cast<UINT64>(n1) << 32);
+	int64_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 SBYTE CBinaryStream::ReadSByte()
@@ -163,25 +211,23 @@ int CBinaryStream::Read7BitInt()
 
 UINT16 CBinaryStream::ReadUInt16()
 {
-	BYTE buffer[2] = {0};
-	ReadIntoBuffer(buffer);
-	return static_cast<UINT16>(buffer[0]) | (static_cast<UINT16>(buffer[1]) << 8);
+	uint16_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 UINT32 CBinaryStream::ReadUInt32()
 {
-	BYTE buffer[4] = {0};
-	ReadIntoBuffer(buffer);
-	return (static_cast<UINT32>(buffer[0]) | (static_cast<UINT32>(buffer[1]) << 8) | (static_cast<UINT32>(buffer[2]) << 16) | (static_cast<UINT32>(buffer[3]) << 24));
+	uint32_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 UINT64 CBinaryStream::ReadUInt64()
 {
-	BYTE buffer[8] = {0};
-	ReadIntoBuffer(buffer);
-	UINT32 n1 = (static_cast<INT32>(buffer[0]) | (static_cast<INT32>(buffer[1]) << 8) | (static_cast<INT32>(buffer[2]) << 16) | (static_cast<INT32>(buffer[3]) << 24));
-	UINT32 n2 = (static_cast<INT32>(buffer[4]) | (static_cast<INT32>(buffer[5]) << 8) | (static_cast<INT32>(buffer[6]) << 16) | (static_cast<INT32>(buffer[7]) << 24));
-	return static_cast<UINT64>(n1) | (static_cast<UINT64>(n1) << 32);
+	uint64_u val;
+	ReadIntoBuffer(val.buffer);
+	return val.value;
 }
 
 

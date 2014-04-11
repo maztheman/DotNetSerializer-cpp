@@ -14,6 +14,7 @@
 #include <set>
 #include <algorithm>
 #include <sstream>
+#include <stdint.h>
 
 typedef unsigned char BYTE, *LPBYTE;
 typedef signed char SBYTE, *LPSBYTE;
