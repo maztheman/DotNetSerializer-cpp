@@ -1,8 +1,14 @@
 Project Summary
 ===============
-This project attempts to deserialize a .NET object.  It is written in native c++ with some platform specific stuff.
+This project attempts to deserialize a .NET object.
 I created this project because I could not find any other library that could do what I wanted.
-This project was compiled in vc11 (Visual Studio 2012), however I will try to get other builds in soon...
+This is a toy project.
+
+Alpha 0.0.2
+===========
+- Use cmake to build now
+- Should work with any compiler ?
+- Code is seprated into library and a example app program
 
 
 Alpha 0.0.1
@@ -19,10 +25,9 @@ Fixed:
 - member references are hooked up properly now.
   
 TODO:
-- Add build project for MinGW GCC.
-- Add build project for GCC.
 - Add More types (some primatives not supported, but easily added)
 - Make this a LIB not a command line exe, still bundle exec as a example.
 - Clean up code
 - Try to reduce allocs
-- Split up the platform specific crap.
+- Use std::variant to hold the different field types.
+
