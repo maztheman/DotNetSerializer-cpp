@@ -19,6 +19,7 @@ enum EDataType
 	eDataType_UInt32		= 0x0F,
 	eDataType_UInt64		= 0x10,
 	eDataType_String		= 0x12,
+	eDataType_Null			= 0xFF
 };
 
-typedef std::vector<EDataType> CDataTypeVector;
+using CDataTypeVector = std::vector<EDataType>;

@@ -3,6 +3,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include <span>
 
 using std::istream;
 using std::string;
@@ -42,6 +43,8 @@ public:
 	uint16_t ReadUInt16();
 	uint32_t ReadUInt32();
 	uint64_t ReadUInt64();
+
+	std::span<uint8_t> Peek(size_t sz);
 
 	inline bool IsEOF() 
 	{ 

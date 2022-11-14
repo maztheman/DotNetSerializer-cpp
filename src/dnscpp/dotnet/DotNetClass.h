@@ -1,11 +1,14 @@
 #pragma once
 
 #include "DotNetField.h"
+#include "DotNetPrimitiveTypeField.h"
 
 #include "types/DataType.h"
 #include "types/SchemaDataType.h"
 #include "types/ArrayType.h"
 #include "types/SchemaType.h"
+
+#include <string>
 
 class CField
 {
@@ -26,6 +29,8 @@ using CFieldVector = std::vector<CField>;
 
 class CDotNetClass
 {
+	inline static constexpr size_t npos = ~0UL;
+
 	PROPERTY(ID, uint32_t, m_nId)
 	PROPERTY(Name, std::string, m_sName)
 	PROPERTY(FieldCount, int32_t, m_nFieldCount)
@@ -42,45 +47,10 @@ public:
 	CDotNetClass(void);
 	~CDotNetClass(void);
 
-	int16_t GetInt16(const std::string& name);
-	int32_t GetInt32(const std::string& name);
-	int64_t GetInt64(const std::string& name);
-	std::string GetString(const std::string& name);
+	const DotNetPrimitiveType& GetValue(const std::string& name) const;
 	CDotNetClass* GetObject(const std::string& name);
-	CInt32Vector& GetInt32Array(const std::string& name);
-	CStringVector& GetStringArray(const std::string& name);
-
 protected:
-
-	size_t FindName(const std::string& name);
-
-	template<typename DATA_TYPE, typename FIELD_TYPE>
-	DATA_TYPE GetData(const std::string& name)
-	{
-		size_t nIndex = FindName(name);
-		if (nIndex == -1)
-			return static_cast<DATA_TYPE>(-1);
-		auto pField = m_arFieldValues[nIndex];
-		FIELD_TYPE* pValue = dynamic_cast<FIELD_TYPE*>(pField.get());
-		if (pValue == nullptr)
-			return static_cast<DATA_TYPE>(-1);
-		return static_cast<DATA_TYPE>(pValue->Value());
-	}
-
-	template<typename DATA_TYPE, typename FIELD_TYPE>
-	DATA_TYPE& GetArrayData(const std::string& name)
-	{
-		size_t nIndex = FindName(name);
-		if (nIndex == -1)
-			throw std::runtime_error("Field doesnt exist");
-
-		auto pField = m_arFieldValues[nIndex];
-		FIELD_TYPE* pValue = dynamic_cast<FIELD_TYPE*>(pField.get());
-		if (pValue == nullptr)
-			throw std::runtime_error("Field is not correct type");
-
-		return pValue->Value();
-	}
+	size_t FindName(const std::string& name) const;
 };
 
 using CDotNetClassPtrVector = std::vector<std::shared_ptr<CDotNetClass>>;

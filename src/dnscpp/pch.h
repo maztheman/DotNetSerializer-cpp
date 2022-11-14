@@ -15,6 +15,8 @@
 
 #include "types/TypeAliases.h"
 
+#include "fmt/format.h"
+
 #define PROPERTY(name, type, var)\
 private:\
 type var;\

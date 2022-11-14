@@ -8,16 +8,19 @@ class CMemberReferenceField : public CDotNetField
 public:
 	CMemberReferenceField()
 		: m_uiReferenceID(-1)
+		, CDotNetField(DotNetFieldType::MemberReference)
 	{
 	}
 	CMemberReferenceField(uint32_t id)
 		: m_uiReferenceID(id)
+		, CDotNetField(DotNetFieldType::MemberReference)
 	{
 	}
 
 private:
-	EDataType Type() const { return eDataType_UInt32; }
-	std::string do_ToString() const { 
+	EDataType Type() const override { return eDataType_UInt32; }
+
+	std::string do_ToString() const override { 
 		std::stringstream ss;
 		ss << m_uiReferenceID;
 		std::string sVal = ss.str();

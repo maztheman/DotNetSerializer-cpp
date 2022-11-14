@@ -1,5 +1,4 @@
-#ifndef __ARRAY_TYPE_H__
-#define __ARRAY_TYPE_H__
+#pragma once
 
 enum EArrayType {
 	eArrayType_Invalid				=   -1,
@@ -7,5 +6,3 @@ enum EArrayType {
 	eArrayType_Jagged				= 0x01,
 	eArrayType_MultiDimension		= 0x02,
 };
-
-#endif

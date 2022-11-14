@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+static DotNetPrimitiveType nullValue(nulltype{});
+
 CDotNetClass::CDotNetClass(void)
 	: m_nId(-1)
 	, m_nFieldCount(-1)
@@ -18,9 +20,9 @@ CDotNetClass::~CDotNetClass(void)
 	
 }
 
-size_t CDotNetClass::FindName(const std::string& name)
+size_t CDotNetClass::FindName(const std::string& name) const
 {
-	auto it = std::find_if(m_arFields.begin(), m_arFields.end(), [&name] (CField& left) -> bool
+	auto it = std::find_if(m_arFields.begin(), m_arFields.end(), [&name] (const auto& left) -> bool
 	{
 		std::string sTemp = left.GetName();
 		size_t nIndex = sTemp.find("k__BackingField");
@@ -35,55 +37,37 @@ size_t CDotNetClass::FindName(const std::string& name)
 	{
 		return std::distance(m_arFields.begin(), it);
 	}
-	return ~0UL;
+	return npos;
 }
 
-int16_t CDotNetClass::GetInt16(const std::string& name)
+const DotNetPrimitiveType& CDotNetClass::GetValue(const std::string& name) const
 {
-	return GetData<int16_t, CInt16Field>(name);
-}
-
-int32_t CDotNetClass::GetInt32(const std::string& name)
-{
-	return GetData<int32_t, CInt32Field>(name);
-}
-
-CStringVector& CDotNetClass::GetStringArray(const std::string& name)
-{
-	return GetArrayData<CStringVector , CStringArrayField>(name);
-}
-
-CInt32Vector& CDotNetClass::GetInt32Array(const std::string& name)
-{
-	return GetArrayData<CInt32Vector , CInt32ArrayField>(name);
-}
-
-int64_t CDotNetClass::GetInt64(const std::string& name)
-{
-	return GetData<int64_t, CInt64Field>(name);
-}
-
-std::string CDotNetClass::GetString(const std::string& name)
-{
-	std::string sValue;
 	size_t nIndex = FindName(name);
-	if (nIndex == -1)
-		return sValue;
+	if (nIndex == npos)
+	{
+		return nullValue;
+	}
 	auto pField = m_arFieldValues[nIndex];
-	auto pValue = dynamic_cast<CStringField*>(pField.get());
+	auto pValue = dynamic_cast<DotNetPrimitiveTypeField*>(pField.get());
 	if (pValue == nullptr)
-		return sValue;
-	return pValue->Value();
+	{
+		return nullValue;
+	}
+	return pValue->GetValue();
 }
 
 CDotNetClass* CDotNetClass::GetObject(const std::string& name)
 {
 	size_t nIndex = FindName(name);
-	if (nIndex == -1)
+	if (nIndex == npos)
+	{
 		return nullptr;
+	}
 	auto pField = m_arFieldValues[nIndex];
 	auto pValue = dynamic_cast<CUserClassField*>(pField.get());
 	if (pValue == nullptr)
+	{
 		return nullptr;
+	}
 	return pValue->GetClassObject();
 }

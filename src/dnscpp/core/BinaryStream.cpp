@@ -175,3 +175,13 @@ uint64_t CBinaryStream::ReadUInt64()
 }
 
 
+std::span<uint8_t> CBinaryStream::Peek(size_t sz)
+{
+	if ((m_nIndex + sz) >= m_nSize)
+	{
+		sz = m_nSize - m_nIndex;
+	}
+
+	return std::span<uint8_t>(m_arData.data(), m_arData.size()).subspan(m_nIndex, sz);
+}
+

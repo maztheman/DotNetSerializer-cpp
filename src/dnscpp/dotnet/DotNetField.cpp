@@ -3,9 +3,10 @@
 #include "UserClassField.h"
 #include "MemberReferenceField.h"
 
-CDotNetField::CDotNetField(void)
+CDotNetField::CDotNetField(DotNetFieldType eFieldType)
 	: m_uiObjectID(~0U)
 	, m_eSchemaType(eSchemaType_Invalid)
+	, m_FieldType(eFieldType)
 {
 }
 
