@@ -62,6 +62,31 @@ std::shared_ptr<CDotNetField> ReadPrimative(CBinaryStream& stream, EDataType eDa
 			pField = p;
 		}
 		break;
+	case eDataType_SByte:
+		{
+			auto pIntField = std::make_shared<DotNetPrimitiveTypeField>(eDataType, stream.ReadSByte());
+			pField = pIntField;
+		}
+	break;
+	case eDataType_UInt16:
+		{
+			auto pIntField = std::make_shared<DotNetPrimitiveTypeField>(eDataType, stream.ReadUInt16());
+			pField = pIntField;
+		}
+	break;
+	case eDataType_UInt32:
+		{
+			auto pIntField = std::make_shared<DotNetPrimitiveTypeField>(eDataType, stream.ReadUInt32());
+			pField = pIntField;
+		}
+	break;
+	case eDataType_UInt64:
+		{
+			auto pIntField = std::make_shared<DotNetPrimitiveTypeField>(eDataType, stream.ReadUInt64());
+			pField = pIntField;
+		}
+	break;
+
 	default:
 		break;
 	};

@@ -21,13 +21,6 @@ std::shared_ptr<CDotNetField> ReadField(CBinaryStream& stream)
 
 std::shared_ptr<CDotNetField> ReadFieldType(CBinaryStream& stream, ESchemaType eFieldType)
 {
-	static int nArrayFiller = 0;
-	if (nArrayFiller > 0)
-	{
-		nArrayFiller--;
-		return nullptr;
-	}
-
     std::shared_ptr<CDotNetField> pField;
     switch(eFieldType) 
 	{
@@ -80,10 +73,13 @@ std::shared_ptr<CDotNetField> ReadFieldType(CBinaryStream& stream, ESchemaType e
 		pField = std::make_shared<DotNetPrimitiveTypeField>(eDataType_Null, nulltype{});
 		break;
 	case eSchemaType_ArrayFiller8b:
-		nArrayFiller = stream.ReadByte();
+		//ideally these should be handled in the thing calling this function
+		fmt::print(stderr, "Ideally eSchemaType_ArrayFiller8b should be handled in the calling function.\n");
+		stream.ReadByte();
 		break;
 	case eSchemaType_ArrayFiller32b:
-		nArrayFiller = stream.ReadUInt32();
+		fmt::print(stderr, "Ideally eSchemaType_ArrayFiller32b should be handled in the calling function.\n");
+		stream.ReadUInt32();
 		break;
 	};
 	pField->SetSchemaType(eFieldType);

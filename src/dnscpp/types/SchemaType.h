@@ -239,4 +239,5 @@ enum ESchemaType
 	eSchemaType_ArrayOfString				= 0x11,
 	eSchemaType_BinaryMethodCall			= 0x15,
 	eSchemaType_BinaryMethodReturn			= 0x16,
+   eSchemaType_UnknownThingy           = 0x18
 };

@@ -9,7 +9,6 @@
 #include "dotnet/DotNetClass.h"
 #include "dotnet/FindDotNetClass.h"
 
-
 std::shared_ptr<CDotNetClass> ReadArrayItem(CBinaryStream& stream)
 {
     auto pClass = std::make_shared<CDotNetClass>();
@@ -18,21 +17,13 @@ std::shared_ptr<CDotNetClass> ReadArrayItem(CBinaryStream& stream)
 	pClass->SetID(stream.ReadUInt32());
 	uint32_t schemaObjectID = stream.ReadUInt32();
 
-    fmt::print(stderr, "find class id {}\n", schemaObjectID);
-
-	if (auto pRefClass = FindDotNetClassByID(schemaObjectID);
-	    pRefClass != nullptr)
+	if (auto pRefClass = FindDotNetClassByID(schemaObjectID); pRefClass != nullptr)
 	{
-        fmt::print(stderr, "found class\n");
-
     	int32_t nFieldCount = pRefClass->GetFieldCount();
 	    pClass->SetSchemaReferenceClass(pRefClass);
-	    auto fields = pRefClass->Fields().data();
-	    pClass->FieldValues().resize(nFieldCount, nullptr);
-	    auto ppFieldValues = pClass->FieldValues().data();
-	    for(int32_t i = 0; i < nFieldCount; i++) 
+	    pClass->FieldValues().reserve(nFieldCount);
+	    for(auto& field : pRefClass->Fields()) 
 	    {
-			auto& field = fields[i];
 			std::shared_ptr<CDotNetField> pField = nullptr;
 			if (field.GetSchemaDataType() == eSchemaDataType_Primitive) 
 			{
@@ -48,8 +39,8 @@ std::shared_ptr<CDotNetClass> ReadArrayItem(CBinaryStream& stream)
 			}
 		    pField->SetName(field.GetName());
 		    pField->SetParent(pClass);
-	    	ppFieldValues[i] = pField;
-    	}
+			pClass->FieldValues().push_back(pField);
+	   	}
 	}
 	return pClass;
 }

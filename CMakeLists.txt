@@ -31,7 +31,7 @@ FetchContent_MakeAvailable(_project_options)
 include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 project(dnscpp_project 
-        VERSION 0.0.1
+        VERSION 0.1.0
         DESCRIPTION "DotNetSerializer-cpp"
         HOMEPAGE_URL "https://github.com/maztheman/DotNetSerializer-cpp"
         LANGUAGES C CXX)

@@ -16,7 +16,6 @@
 #include "serialization/Array.h"
 #include "serialization/ArrayItem.h"
 #include "serialization/ArrayOfString.h"
-#include "serialization/ArrayFiller8b.h"
 #include "serialization/Assembly.h"
 #include "serialization/Field.h"
 #include "serialization/Class.h"
@@ -77,22 +76,20 @@ void CDotNetFileReader::Deserialize()
 			case eSchemaType_ArrayOfString:
 				ReadArrayOfString(m_Stream);
 			break;
-			case eSchemaType_ArrayFiller8b:
-				ReadArrayFiller8b(m_Stream);
-			break;
 			case eSchemaType_ArrayOfPrimitiveType:
 				ReadArrayOfPrimitive(m_Stream);
 			break;
 			case eSchemaType_ArrayOfObject:
 			    ReadArrayOfObject(m_Stream);
 			break;
-				//must mean assembly
 			case eSchemaType_Assembly:
 				ReadAssembly(m_Stream);
 				break;
 			}
 		}
-	} catch(std::exception& e) {
+	} 
+	catch(std::exception& e) 
+	{
 		std::cout << "Error caught! -->" << e.what() << "<--" << std::endl;
 	}
 }

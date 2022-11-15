@@ -1,12 +1,12 @@
 set(SRCS
     Array.cpp
-    ArrayFiller8b.cpp
     ArrayItem.cpp
     ArrayOfObject.cpp
     ArrayOfPrimitive.cpp
     ArrayOfString.cpp
     Assembly.cpp
     Class.cpp
+    Common.cpp
     End.cpp
     Field.cpp
     MemberReference.cpp
