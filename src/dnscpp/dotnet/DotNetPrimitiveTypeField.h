@@ -7,7 +7,7 @@
 struct nulltype
 {};
 
-using DotNetPrimitiveType = std::variant<bool, nulltype, int8_t, int16_t, int32_t, int64_t,
+using DotNetPrimitiveType = std::variant<bool, nulltype, char, int8_t, int16_t, int32_t, int64_t,
         double, std::string, uint8_t, uint16_t, uint32_t, uint64_t, CStringVector, CInt32Vector>;
 
 class DotNetPrimitiveTypeField : public CDotNetField

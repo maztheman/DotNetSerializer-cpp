@@ -51,12 +51,12 @@ void ReadArrayOfPrimitive(CBinaryStream& stream)
     uint32_t count = stream.ReadUInt32();
     auto eDataType = static_cast<EDataType>(stream.ReadByte());
 
-    pClass->FieldValues().resize(count);
+    pClass->FieldValues().reserve(count);
 
-    std::span<uint8_t> pp;
     for(uint32_t i = 0; i < count; i++)
     {
-        pClass->FieldValues()[i] = ReadPrimative(stream, eDataType);
+        auto pField = ReadPrimative(stream, eDataType);
+        pClass->FieldValues().push_back(pField);
     }
 
     return;

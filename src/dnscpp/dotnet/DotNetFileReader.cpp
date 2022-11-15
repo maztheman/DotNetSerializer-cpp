@@ -22,6 +22,7 @@
 #include "serialization/Class.h"
 #include "serialization/End.h"
 #include "serialization/ArrayOfPrimitive.h"
+#include "serialization/ArrayOfObject.h"
 
 #include <iostream>
 
@@ -81,6 +82,9 @@ void CDotNetFileReader::Deserialize()
 			break;
 			case eSchemaType_ArrayOfPrimitiveType:
 				ReadArrayOfPrimitive(m_Stream);
+			break;
+			case eSchemaType_ArrayOfObject:
+			    ReadArrayOfObject(m_Stream);
 			break;
 				//must mean assembly
 			case eSchemaType_Assembly:

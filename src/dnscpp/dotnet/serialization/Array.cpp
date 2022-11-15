@@ -1,6 +1,8 @@
 #include "Array.h"
 
 #include "MemberReference.h"
+#include "ArrayItem.h"
+#include "Class.h"
 
 #include "core/BinaryStream.h"
 #include "core/DataIsland.h"
@@ -23,7 +25,7 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 	
 	pArray->SetSchemaType(eSchemaType_BinaryArray);
 	pArray->SetID(stream.ReadUInt32());
-	
+
 	EArrayType eType = static_cast<EArrayType>(stream.ReadByte());
 	pArray->SetArrayType(eType);
 	uint32_t nDims = stream.ReadUInt32();
@@ -37,6 +39,7 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 	pArray->FieldValues().resize(nNumOfFields, nullptr);
 	ESchemaDataType eSchemaDataType = static_cast<ESchemaDataType>(stream.ReadByte());
 	CField& element = pArray->Element();
+
 	element.SetSchemaDataType(eSchemaDataType);
 	if (eSchemaDataType == eSchemaDataType_UserDefinedObject)
 	{
@@ -52,12 +55,20 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 		EDataType eType = static_cast<EDataType>(stream.ReadByte());
 		element.SetDataType(eType);
 	}
+
+    auto peek = stream.Peek(50);
+    for(auto& p : peek)
+    {
+        fmt::print(stderr, "{:X} ", p);
+    }
+
+	
 	bool bContinue = nNumOfFields > 0;
 	uint32_t nCurrentDim = 0;
 	int nIndex = 0;
 	size_t nField = 0;
 	auto ppFields = pArray->FieldValues().data();
-	while(bContinue) 
+	while(bContinue)
 	{
 		ESchemaType eSchemaType = static_cast<ESchemaType>(stream.ReadByte());
 		switch(eSchemaType) {
@@ -71,7 +82,7 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 		case eSchemaType_ObjectNull:
 			nIndex++;
 			break;
-		case eSchemaType_ArrayFiller8b: 
+		case eSchemaType_ArrayFiller8b:
 			{
 				int nFiller = stream.ReadByte();
 				nIndex += nFiller;
@@ -83,6 +94,42 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 				uint32_t nFiller = stream.ReadUInt32();
 				nIndex += nFiller;
 				nField += nFiller;
+			}
+			break;
+			case eSchemaType_Class:
+            {
+				auto p = std::make_shared<CUserClassField>();
+                auto pNewClass = ReadClass(stream, false);
+                p->SetClassObject(pNewClass);
+                p->SetSchemaType(pNewClass->GetSchemaType());
+                p->SetParent(pArray);
+                ppFields[nField] = p;
+                nField++;
+                nIndex++;
+            }
+			break;
+			case eSchemaType_SystemClass:
+            {
+				auto p = std::make_shared<CUserClassField>();
+                auto pNewClass = ReadClass(stream, true);
+                p->SetClassObject(pNewClass);
+                p->SetSchemaType(pNewClass->GetSchemaType());
+                p->SetParent(pArray);
+                ppFields[nField] = p;
+                nField++;
+                nIndex++;
+            }
+			break;
+			case eSchemaType_ArrayItem:
+			{
+				auto p = std::make_shared<CUserClassField>();
+                auto pNewClass = ReadArrayItem(stream);
+                p->SetClassObject(pNewClass);
+                p->SetSchemaType(pNewClass->GetSchemaType());
+                p->SetParent(pArray);
+                ppFields[nField] = p;
+                nField++;
+                nIndex++;
 			}
 			break;
 		case eSchemaDataType_Array:
@@ -99,6 +146,8 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 			break;
 		default:
 			fmt::print(stderr, "ReadArray, Unhandled schema type {} ({})\n", EnumToString(eSchemaType), (int)eSchemaType);
+			    exit(0);
+
 			break;
 		};
 		if (eType == eArrayType_SingleDimension)
@@ -114,6 +163,7 @@ std::shared_ptr<CDotNetClass> ReadArray(CBinaryStream& stream)
 			if (nIndex > pArray->ArraySizes()[nCurrentDim])
 			{
 				nCurrentDim++;
+				nIndex = 0;
 			}
 			if (nCurrentDim > nDims) {
 				bContinue = false;

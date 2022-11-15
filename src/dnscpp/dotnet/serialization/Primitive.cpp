@@ -11,6 +11,13 @@ std::shared_ptr<CDotNetField> ReadPrimative(CBinaryStream& stream, EDataType eDa
     std::shared_ptr<CDotNetField> pField = nullptr;
 	switch(eDataType) 
 	{
+    case eDataType_Char:
+    {
+        
+        auto pValue = std::make_shared<DotNetPrimitiveTypeField>(eDataType, stream.ReadChar());
+        pField = pValue;
+    }
+    break;
 	case eDataType_String:
 		{
 			std::string sValue;

@@ -55,44 +55,24 @@ std::shared_ptr<CDotNetClass> ReadArrayOfString(CBinaryStream& stream)
     pClass->SetSchemaType(eSchemaType_ArrayOfString);
     GDataIsland<CDotNetClass>().Data.push_back(pClass);
     pClass->SetID(stream.ReadUInt32());
-	uint32_t schmeaObjectID = stream.ReadUInt32();
+	uint32_t count = stream.ReadUInt32();
 
-    fmt::print(stderr, "find class id {}\n", schmeaObjectID);
+    pClass->FieldValues().reserve(count);
 
-	if (auto pRefClass = FindDotNetClassByID(schmeaObjectID);
-	    pRefClass != nullptr)
+	for(uint32_t i = 0; i < count; i++)
 	{
-        auto& fieldValues = pRefClass->FieldValues();
+	    auto eSchemaType = static_cast<ESchemaType>(stream.ReadByte());
+	    if (eSchemaType == eSchemaType_ArrayFiller8b)
+	    {
+            i += stream.ReadByte();
+	    }
+	    else
+	    {
+            auto pField = ReadFieldType(stream, eSchemaType);
+            pClass->FieldValues().push_back(pField);
+	    }
 
-        if (auto it = std::find_if(fieldValues.begin(), fieldValues.end(), FindSizeFieldValue);
-            it != fieldValues.end()
-        )
-        {
-            if (auto pSizeField = dynamic_cast<DotNetPrimitiveTypeField*>((*it).get()); pSizeField != nullptr)
-            {
-                uint64_t sz = std::visit([](auto&& arg) -> uint64_t {
-                    return GetSize(arg);
-                },  pSizeField->GetValue());
-
-                pClass->FieldValues().resize(sz);
-
-                for(uint64_t i = 0; i < sz; i++)
-                {
-                    pClass->FieldValues()[i] = ReadField(stream);
-                }
-            }
-            else
-            {
-                fmt::print(stderr, "_size found, but its not a primitive??\n");
-            }
-        }
-        else
-        {
-            fmt::print(stderr, "Could not find _size propert which we need to know the size of array\n");
-        }
-        //we always search for _size
-
-    }
+	}
 
     return pClass;
 }

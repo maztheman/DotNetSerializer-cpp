@@ -2,6 +2,7 @@ set(SRCS
     Array.cpp
     ArrayFiller8b.cpp
     ArrayItem.cpp
+    ArrayOfObject.cpp
     ArrayOfPrimitive.cpp
     ArrayOfString.cpp
     Assembly.cpp
